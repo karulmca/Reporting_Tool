@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 // The React app runs on :5173 in dev and proxies all /api (and /api/backup)
@@ -11,5 +12,13 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:8080',
     },
+  },
+  // Vitest unit-test config (jsdom + Testing Library).
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/test/setup.js',
+    css: false,
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
   },
 })

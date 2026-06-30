@@ -1,0 +1,5 @@
+# Test dependencies for the backend (pytest + FastAPI TestClient).
+# Install with:  .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+-r requirements.txt
+pytest==7.4.4
+httpx==0.24.1

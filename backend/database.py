@@ -10,8 +10,10 @@ from models import (
 )
 
 # Absolute path so the DB / backup work regardless of the current directory.
+# The path can be overridden via the BLUEBOLT_DB env var (used by the test suite
+# to run against an isolated, throwaway database).
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_FILE = os.path.join(BASE_DIR, 'bluebolt.db')
+DB_FILE = os.environ.get('BLUEBOLT_DB') or os.path.join(BASE_DIR, 'bluebolt.db')
 DATABASE_URL = f'sqlite:///{DB_FILE}'
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})

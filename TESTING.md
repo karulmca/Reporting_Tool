@@ -1,5 +1,43 @@
 # Reporting Tools - Testing Guide
 
+## Automated Tests
+
+The project has automated test suites for both tiers.
+
+### Backend — pytest (FastAPI TestClient)
+
+Integration tests covering every API module (pods, members, ideas, sprints,
+training, fields, defects, board, backups, misc). Each run uses a throwaway
+SQLite database (via the `BLUEBOLT_DB` env var) so your real `bluebolt.db` is
+never touched.
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt   # one-time
+.\.venv\Scripts\python.exe -m pytest
+```
+
+### Frontend — Vitest + React Testing Library
+
+Unit tests for the pure helpers/analytics and the API client, plus component
+tests for the shared UI primitives and the Backups view (jsdom environment).
+
+```powershell
+cd frontend
+npm install --include=dev    # NOTE: required because NODE_ENV=production is set
+npm test                     # one-off run  (npm run test:watch for watch mode)
+```
+
+> Heads-up: this machine has `NODE_ENV=production` in the environment, so a plain
+> `npm install` **skips and prunes devDependencies** (including Vite and Vitest).
+> Always use `npm install --include=dev` here, or unset `NODE_ENV` first.
+
+Test layout:
+- `backend/tests/` — `conftest.py` + `test_*.py` (one file per module)
+- `frontend/src/**/*.test.{js,jsx}` — colocated with the code they cover
+
+---
+
 ## Prerequisites
 
 - Node.js 16+ and npm (for frontend)
