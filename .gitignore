@@ -1,0 +1,38 @@
+# ---- Python (backend) ----
+backend/.venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---- Node (frontend) ----
+frontend/node_modules/
+node_modules/
+frontend/dist/
+dist/
+.vite/
+npm-debug.log*
+
+# ---- Databases ----
+# Ignore all SQLite DBs (including the live bluebolt.db). The app seeds demo data
+# on first run, so no database is kept in version control.
+*.db
+*.db.bak*
+backend/backups/
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ---- Logs ----
+*.log
+
+# ---- Claude Code (machine-local) ----
+.claude/settings.local.json
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

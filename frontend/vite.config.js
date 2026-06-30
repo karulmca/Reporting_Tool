@@ -1,0 +1,15 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// The React app runs on :5173 in dev and proxies all /api (and /api/backup)
+// calls to the FastAPI backend on :8080, so the browser talks to a single
+// origin and there are no CORS concerns.
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': 'http://localhost:8080',
+    },
+  },
+})

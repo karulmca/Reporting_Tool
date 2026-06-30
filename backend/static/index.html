@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlueBolt Innovation Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#06080f;--s1:#0d1117;--s2:#161b26;--s3:#1c2333;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);--b3:rgba(255,255,255,.18);
+  --tx:#e2e8f4;--mu:#5e6a82;--mu2:#8899b0;
+  --blue:#3b82f6;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --purple:#8b5cf6;--teal:#14b8a6;--orange:#f97316;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:8px;--rl:12px;--rxl:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5}
+.app{display:flex;height:100vh}
+.sb{width:236px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:18px 18px 14px;border-bottom:1px solid var(--b1)}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sb-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sb-head h1{font-size:14px;font-weight:700;letter-spacing:-.3px}
+.sb-sub{font-size:11px;color:var(--mu);margin-top:1px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.nav-g{font-size:10px;font-weight:600;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;padding:10px 8px 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--mu2);font-size:12.5px;font-weight:500;transition:all .15s;margin-bottom:2px;user-select:none}
+.ni:hover{background:var(--s2);color:var(--tx)}
+.ni.active{background:rgba(59,130,246,.15);color:var(--blue)}
+.ni svg{flex-shrink:0;width:15px;height:15px}
+.bc{margin-left:auto;background:var(--s3);border-radius:10px;padding:1px 7px;font-size:10px;font-family:var(--mono);color:var(--mu2)}
+.ni.active .bc{background:rgba(59,130,246,.2);color:var(--blue)}
+.sb-foot{padding:10px 8px;border-top:1px solid var(--b1)}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
+.tb{padding:14px 24px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--s1);position:sticky;top:0;z-index:10}
+.tb h2{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.tb-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--b2);background:var(--s2);color:var(--tx);white-space:nowrap}
+.btn:hover{background:var(--s3);border-color:var(--b3)}
+.btn-p{background:var(--blue);border-color:transparent;color:#fff}.btn-p:hover{background:#2563eb}
+.btn-g{background:var(--green);border-color:transparent;color:#022010}.btn-g:hover{background:#16a34a}
+.btn-d{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--red)}.btn-d:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.con{padding:22px 24px;flex:1}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:18px 20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:16px 18px}
+.mc-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);margin-bottom:8px}
+.mc-v{font-size:26px;font-weight:700;letter-spacing:-.5px;font-family:var(--mono)}
+.mc-s{font-size:11px;color:var(--mu);margin-top:3px}
+.mc-pb{height:3px;background:var(--s3);border-radius:2px;margin-top:10px;overflow:hidden}
+.mc-pf{height:100%;border-radius:2px;transition:width .5s}
+.fl{display:block;font-size:10.5px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:8px;color:var(--tx);font-family:var(--font);font-size:12.5px;padding:8px 11px;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);background:var(--s3)}
+textarea{resize:vertical;min-height:72px}
+select option{background:var(--s1)}
+.fr{margin-bottom:12px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.tw{overflow-x:auto;border-radius:var(--rl);border:1px solid var(--b1)}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;padding:10px 13px;text-align:left;border-bottom:1px solid var(--b1);background:var(--s2);white-space:nowrap}
+td{padding:10px 13px;border-bottom:1px solid var(--b1);font-size:12.5px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.bb{background:rgba(59,130,246,.14);color:#93c5fd}
+.bg{background:rgba(34,197,94,.14);color:#86efac}
+.ba{background:rgba(245,158,11,.14);color:#fcd34d}
+.br{background:rgba(239,68,68,.14);color:#fca5a5}
+.bp{background:rgba(139,92,246,.14);color:#c4b5fd}
+.bt{background:rgba(20,184,166,.14);color:#5eead4}
+.bor{background:rgba(249,115,22,.14);color:#fdba74}
+.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sec{display:none}.sec.active{display:block}
+.pbar{height:6px;border-radius:3px;background:var(--s3);overflow:hidden;margin-top:4px}
+.pbar-f{height:100%;border-radius:3px;transition:width .5s}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center}
+.ov.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl);padding:24px;width:520px;max-width:96vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:18px;letter-spacing:-.2px}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--b1)}
+.tw2{position:fixed;bottom:22px;right:22px;z-index:300;display:flex;flex-direction:column;gap:7px}
+.tst{background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:10px 15px;font-size:12px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 24px rgba(0,0,0,.5);animation:tin .2s ease}
+.tst.s{border-left:3px solid var(--green)}.tst.e{border-left:3px solid var(--red)}.tst.i{border-left:3px solid var(--blue)}
+@keyframes tin{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+.sh{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.dv{height:1px;background:var(--b1);margin:14px 0}
+.stab{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:500;border:1px solid var(--b2);background:var(--s2);color:var(--mu2);transition:all .15s;display:inline-block;margin:0 4px 6px 0}
+.stab:hover{border-color:var(--b3);color:var(--tx)}
+.stab.active{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:var(--blue)}
+.spinner{width:32px;height:32px;border:3px solid var(--b2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-ov{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.sdot.ok{background:var(--green)}.sdot.err{background:var(--red)}.sdot.loading{background:var(--amber)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="load-ov" class="load-ov">
+  <div class="spinner"></div>
+  <div style="color:var(--mu2);font-size:13px">Connecting to server...</div>
+  <div id="load-url" style="color:var(--mu);font-size:11px"></div>
+</div>
+
+<div class="app" id="app" style="display:none">
+
+<nav class="sb">
+  <div class="sb-head">
+    <div class="sb-logo"><div class="sb-icon">&#9889;</div><div><h1>BlueBolt</h1><div class="sb-sub" id="sb-sub">Innovation Tracker</div></div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-g">Overview</div>
+    <div class="ni active" onclick="nav('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+    <div class="nav-g">Tracking</div>
+    <div class="ni" onclick="nav('members')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Members<span class="bc" id="nb-members">0</span></div>
+    <div class="ni" onclick="nav('ideas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Ideas<span class="bc" id="nb-ideas">0</span></div>
+    <div class="ni" onclick="nav('sprints')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Sprint Tracker</div>
+    <div class="ni" onclick="nav('training')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Training</div>
+    <div class="nav-g">Analytics</div>
+    <div class="ni" onclick="nav('graphs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-4 3 3 5-6"/></svg>Graphs &amp; Progress</div>
+    <div class="nav-g">Admin</div>
+    <div class="ni" onclick="nav('pods')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>PODs / Teams</div>
+    <div class="ni" onclick="nav('fields')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>Custom Fields</div>
+    <div class="ni" onclick="nav('audit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Audit Log</div>
+  </div>
+  <div class="sb-foot">
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border-radius:8px;cursor:pointer;margin-bottom:6px" onclick="checkHealth()">
+      <div class="sdot loading" id="api-dot"></div>
+      <div style="flex:1;min-width:0"><div id="api-txt" style="font-size:11px;color:var(--mu2)">Connecting...</div><div id="api-url" style="font-size:10px;color:var(--mu)">localhost:8080</div></div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm" style="flex:1" onclick="toggleRole()"><span id="role-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0"></span><span id="role-lbl">Admin</span></button>
+      <button class="btn btn-sm" onclick="downloadBackup()" title="Download DB backup">&#128190;</button>
+      <button class="btn btn-sm" onclick="loadAll()" title="Refresh data">&#8635;</button>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+
+<div class="sec active" id="sec-dashboard">
+  <div class="tb"><h2>Dashboard</h2><div class="tb-r"><span id="today-lbl" style="font-size:11px;color:var(--mu)"></span></div></div>
+  <div class="con" id="dash-con"><div style="text-align:center;padding:60px"><div class="spinner" style="margin:0 auto 14px"></div><div style="color:var(--mu)">Loading...</div></div></div>
+</div>
+
+<div class="sec" id="sec-members">
+  <div class="tb"><h2>Members</h2>
+    <div class="tb-r">
+      <select id="mem-pod-f" style="width:auto" onchange="renderMembers()"><option value="">All PODs</option></select>
+      <button class="btn btn-p btn-sm" onclick="openModal('add-member')">+ Add Member</button>
+      <button class="btn btn-sm" onclick="exportCSV('members')">&#8659; CSV</button>
+    </div>
+  </div>
+  <div class="con"><div id="members-con"></div></div>
+</div>
+
+<div class="sec" id="sec-ideas">
+  <div class="tb"><h2>Ideas &amp; Innovations</h2>
+    <div class="tb-r">
+      <select id="idea-status-f" style="width:auto" onchange="renderIdeas()">
+        <option value="">All Status</option>
+        <option>Implemented</option><option>In Progress</option><option>POC Stage</option>
+        <option>Proposed</option><option>New</option><option>Ideation</option>
+      </select>
+      <select id="idea-pod-f" style="width:auto" onchange="renderIdeas()"><option value="">All PODs</option></select>
+      <button class="btn btn-p btn-sm" onclick="openModal('add-idea')">+ Add Idea</button>
+      <button class="btn btn-sm" onclick="exportCSV('ideas')">&#8659; CSV</button>
+    </div>
+  </div>
+  <div class="con"><div id="ideas-con"></div></div>
+</div>
+
+<div class="sec" id="sec-sprints">
+  <div class="tb"><h2>Sprint Tracker</h2>
+    <div class="tb-r">
+      <select id="sprint-pod-f" style="width:auto" onchange="renderSprints()"><option value="">All PODs</option></select>
+      <button class="btn btn-p btn-sm" onclick="openModal('add-sprint')">+ Add Entry</button>
+      <button class="btn btn-sm" onclick="exportCSV('sprints')">&#8659; CSV</button>
+      <button class="btn btn-sm btn-g" onclick="exportPDF()">&#8659; PDF</button>
+    </div>
+  </div>
+  <div class="con" id="sprints-con"></div>
+</div>
+
+<div class="sec" id="sec-training">
+  <div class="tb"><h2>Training Status</h2>
+    <div class="tb-r">
+      <select id="training-pod-f" style="width:auto" onchange="renderTraining()"><option value="">All PODs</option></select>
+      <button class="btn btn-p btn-sm" onclick="openModal('add-course')">+ Add Course</button>
+      <button class="btn btn-sm" onclick="exportCSV('training')">&#8659; CSV</button>
+    </div>
+  </div>
+  <div class="con" id="training-con"></div>
+</div>
+
+<div class="sec" id="sec-graphs">
+  <div class="tb"><h2>Graphs &amp; Progress</h2>
+    <div class="tb-r"><select id="g-pod-f" style="width:auto" onchange="renderGraphs()"><option value="">All PODs</option></select></div>
+  </div>
+  <div class="con">
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card"><div class="sh">Sprint Committed vs Completed (SP)</div><div style="position:relative;height:240px"><canvas id="ch-sp-sprint"></canvas></div></div>
+      <div class="card"><div class="sh">Ideas by Status</div><div style="position:relative;height:240px"><canvas id="ch-status-pie"></canvas></div></div>
+    </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card"><div class="sh">Member Progress (Implemented vs Target)</div><div style="position:relative;height:260px"><canvas id="ch-member-prog"></canvas></div></div>
+      <div class="card"><div class="sh">Monthly SP Delivery</div><div style="position:relative;height:260px"><canvas id="ch-monthly"></canvas></div></div>
+    </div>
+    <div class="g3">
+      <div class="card"><div class="sh">Ideas by POD</div><div style="position:relative;height:200px"><canvas id="ch-pod-pie"></canvas></div></div>
+      <div class="card"><div class="sh">Target vs Actual (Ideas)</div><div style="position:relative;height:200px"><canvas id="ch-target-actual"></canvas></div></div>
+      <div class="card"><div class="sh">Ideas by Stage</div><div style="position:relative;height:200px"><canvas id="ch-stages"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="sec-pods">
+  <div class="tb"><h2>PODs / Teams</h2><div class="tb-r"><button class="btn btn-p btn-sm" onclick="openModal('add-pod')">+ Add POD</button></div></div>
+  <div class="con" id="pods-con"></div>
+</div>
+
+<div class="sec" id="sec-fields">
+  <div class="tb"><h2>Custom Fields</h2></div>
+  <div class="con">
+    <div class="g2">
+      <div>
+        <div class="sh">Fields on Member Records</div>
+        <div class="card">
+          <div id="cf-member-list"><div style="color:var(--mu);font-size:12px">No custom fields yet.</div></div>
+          <div class="dv"></div>
+          <div class="fg2">
+            <div><label class="fl">Label</label><input type="text" id="cfm-label" placeholder="e.g. Department"></div>
+            <div><label class="fl">Type</label><select id="cfm-type" onchange="toggleCFOpts('m')"><option value="text">Text</option><option value="number">Number</option><option value="select">Dropdown</option></select></div>
+          </div>
+          <div id="cfm-opts-wrap" style="display:none;margin-top:8px"><label class="fl">Options (comma sep.)</label><input type="text" id="cfm-opts" placeholder="A, B, C"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn btn-p btn-sm" onclick="addCF('member')">+ Add Field</button></div>
+        </div>
+      </div>
+      <div>
+        <div class="sh">Fields on Idea Records</div>
+        <div class="card">
+          <div id="cf-idea-list"><div style="color:var(--mu);font-size:12px">No custom fields yet.</div></div>
+          <div class="dv"></div>
+          <div class="fg2">
+            <div><label class="fl">Label</label><input type="text" id="cfi-label" placeholder="e.g. Business Value"></div>
+            <div><label class="fl">Type</label><select id="cfi-type" onchange="toggleCFOpts('i')"><option value="text">Text</option><option value="number">Number</option><option value="select">Dropdown</option><option value="textarea">Long Text</option></select></div>
+          </div>
+          <div id="cfi-opts-wrap" style="display:none;margin-top:8px"><label class="fl">Options (comma sep.)</label><input type="text" id="cfi-opts" placeholder="Low, Medium, High"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn btn-p btn-sm" onclick="addCF('idea')">+ Add Field</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="sec-audit">
+  <div class="tb"><h2>Audit Log</h2><div class="tb-r"><button class="btn btn-sm" onclick="renderAudit()">&#8635; Refresh</button></div></div>
+  <div class="con" id="audit-con"></div>
+</div>
+
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="ov" id="modal-add-member"><div class="modal">
+  <h3>Add Member</h3>
+  <div class="fg2">
+    <div class="fr"><label class="fl">Full Name</label><input id="nm-name" placeholder="Surname, Firstname"></div>
+    <div class="fr"><label class="fl">Employee ID</label><input id="nm-id" placeholder="e.g. 2012144"></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label class="fl">POD / Team</label><select id="nm-pod"></select></div>
+    <div class="fr"><label class="fl">Service Line</label><input id="nm-sl" value="M&amp;E"></div>
+  </div>
+  <div class="fr"><label class="fl">Annual Target (Ideas)</label><input type="number" id="nm-target" value="12" min="0"></div>
+  <div id="nm-cf-fields"></div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('add-member')">Cancel</button><button class="btn btn-p" onclick="addMember()">Add Member</button></div>
+</div></div>
+
+<div class="ov" id="modal-edit-member"><div class="modal">
+  <h3>Edit Member</h3>
+  <input type="hidden" id="em-orig-id">
+  <div class="fg2">
+    <div class="fr"><label class="fl">Full Name</label><input id="em-name"></div>
+    <div class="fr"><label class="fl">Employee ID</label><input id="em-id" style="background:var(--s3);color:var(--mu)" readonly></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label class="fl">POD / Team</label><select id="em-pod"></select></div>
+    <div class="fr"><label class="fl">Service Line</label><input id="em-sl"></div>
+  </div>
+  <div class="fr"><label class="fl">Annual Target</label><input type="number" id="em-target" min="0"></div>
+  <div id="em-cf-fields"></div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('edit-member')">Cancel</button><button class="btn btn-p" onclick="saveMember()">Save</button></div>
+</div></div>
+
+<div class="ov" id="modal-add-idea"><div class="modal">
+  <h3>Add Idea / Innovation</h3>
+  <div class="fr"><label class="fl">Problem Statement</label><textarea id="ni-problem" placeholder="What problem does this solve?"></textarea></div>
+  <div class="fr"><label class="fl">Idea Title</label><input id="ni-title" placeholder="Short descriptive title"></div>
+  <div class="fr"><label class="fl">Description</label><textarea id="ni-desc" style="min-height:90px" placeholder="Full description..."></textarea></div>
+  <div class="fg2">
+    <div class="fr"><label class="fl">Submitter</label><select id="ni-submitter"></select></div>
+    <div class="fr"><label class="fl">Status</label><select id="ni-status"><option>Implemented</option><option>In Progress</option><option>POC Stage</option><option selected>Proposed</option><option>New</option><option>Ideation</option></select></div>
+  </div>
+  <div class="fr"><label class="fl">Contributors (IDs, comma sep.)</label><input id="ni-contribs" placeholder="304951, 716949"></div>
+  <div id="ni-cf-fields"></div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('add-idea')">Cancel</button><button class="btn btn-p" onclick="addIdea()">Add Idea</button></div>
+</div></div>
+
+<div class="ov" id="modal-edit-idea"><div class="modal">
+  <h3>Edit Idea</h3>
+  <input type="hidden" id="ei-id">
+  <div class="fr"><label class="fl">Title</label><input id="ei-title"></div>
+  <div class="fr"><label class="fl">Status</label><select id="ei-status"><option>Implemented</option><option>In Progress</option><option>POC Stage</option><option>Proposed</option><option>New</option><option>Ideation</option></select></div>
+  <div class="fr"><label class="fl">Problem Statement</label><textarea id="ei-problem"></textarea></div>
+  <div class="fr"><label class="fl">Description</label><textarea id="ei-desc" style="min-height:80px"></textarea></div>
+  <div id="ei-cf-fields"></div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('edit-idea')">Cancel</button><button class="btn btn-p" onclick="saveIdea()">Save</button></div>
+</div></div>
+
+<div class="ov" id="modal-view-idea"><div class="modal" style="width:620px;max-width:96vw">
+  <h3 id="vi-title" style="margin-bottom:6px"></h3>
+  <div id="vi-badge" style="margin-bottom:14px"></div>
+  <div id="vi-body" style="font-size:13px;color:var(--mu2);line-height:1.75"></div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('view-idea')">Close</button><button class="btn btn-p" id="vi-edit-btn">Edit</button></div>
+</div></div>
+
+<div class="ov" id="modal-add-sprint"><div class="modal">
+  <h3 id="sprint-modal-title">Add Sprint Entry</h3>
+  <input type="hidden" id="ns-edit-key">
+  <div class="fg2">
+    <div class="fr"><label class="fl">Member</label><select id="ns-member"></select></div>
+    <div class="fr"><label class="fl">Sprint / Month</label><input id="ns-sprint" placeholder="e.g. Jun'26"></div>
+  </div>
+  <div class="fg3">
+    <div class="fr"><label class="fl">Committed SP</label><input type="number" id="ns-committed" min="0" placeholder="0"></div>
+    <div class="fr"><label class="fl">Completed SP</label><input type="number" id="ns-completed" min="0" placeholder="0"></div>
+    <div class="fr"><label class="fl">Idea Target</label><input type="number" id="ns-target-ideas" min="0" placeholder="0"></div>
+  </div>
+  <div class="fr"><label class="fl">Comments</label><input id="ns-comments" placeholder="Optional notes"></div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('add-sprint')">Cancel</button><button class="btn btn-p" onclick="saveSprintEntry()">Save</button></div>
+</div></div>
+
+<div class="ov" id="modal-add-course"><div class="modal">
+  <h3>Add Training Course</h3>
+  <div class="fg2">
+    <div class="fr"><label class="fl">Course ID</label><input id="nc-id" placeholder="e.g. ELRNG01555"></div>
+    <div class="fr"><label class="fl">Course Name</label><input id="nc-name" placeholder="Course title"></div>
+  </div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('add-course')">Cancel</button><button class="btn btn-p" onclick="addCourse()">Add Course</button></div>
+</div></div>
+
+<div class="ov" id="modal-add-pod"><div class="modal">
+  <h3>Add POD / Team</h3>
+  <div class="fg2">
+    <div class="fr"><label class="fl">POD Code</label><input id="np-code" placeholder="e.g. FE, BE, QA"></div>
+    <div class="fr"><label class="fl">POD Name</label><input id="np-name" placeholder="Full team name"></div>
+  </div>
+  <div class="fg2">
+    <div class="fr"><label class="fl">Service Line</label><input id="np-sl" value="M&amp;E"></div>
+    <div class="fr"><label class="fl">Color</label>
+      <select id="np-color">
+        <option value="#3b82f6">Blue</option><option value="#22c55e">Green</option>
+        <option value="#f59e0b">Amber</option><option value="#ef4444">Red</option>
+        <option value="#8b5cf6">Purple</option><option value="#14b8a6">Teal</option>
+        <option value="#f97316">Orange</option><option value="#ec4899">Pink</option>
+      </select>
+    </div>
+  </div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('add-pod')">Cancel</button><button class="btn btn-p" onclick="addPOD()">Add POD</button></div>
+</div></div>
+
+
+<div class="ov" id="modal-edit-pod"><div class="modal">
+  <h3>Edit POD / Team</h3>
+  <input type="hidden" id="ep-code">
+  <div class="fr"><label class="fl">POD Code (read-only)</label><input id="ep-code-display" style="background:var(--s3);color:var(--mu)" readonly></div>
+  <div class="fr"><label class="fl">POD Name</label><input id="ep-name" placeholder="Full team name"></div>
+  <div class="fg2">
+    <div class="fr"><label class="fl">Service Line</label><input id="ep-sl"></div>
+    <div class="fr"><label class="fl">Color</label>
+      <select id="ep-color">
+        <option value="#3b82f6">Blue</option><option value="#22c55e">Green</option>
+        <option value="#f59e0b">Amber</option><option value="#ef4444">Red</option>
+        <option value="#8b5cf6">Purple</option><option value="#14b8a6">Teal</option>
+        <option value="#f97316">Orange</option><option value="#ec4899">Pink</option>
+      </select>
+    </div>
+  </div>
+  <div class="mfoot"><button class="btn" onclick="closeModal('edit-pod')">Cancel</button><button class="btn btn-p" onclick="savePOD()">Save Changes</button></div>
+</div></div>
+<div class="tw2" id="toastwrap"></div>
+
+<script>
+// CONFIG
+const API_BASE = (function(){
+  var h = window.location.hostname || 'localhost';
+  var p = window.location.port || '8080';
+  return 'http://' + h + ':' + p + '/api';
+}());
+
+// PALETTE
+var PAL=['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f97316','#ec4899'];
+var AV_BG=['rgba(59,130,246,.2)','rgba(34,197,94,.2)','rgba(245,158,11,.2)','rgba(139,92,246,.2)','rgba(20,184,166,.2)','rgba(249,115,22,.2)'];
+var AV_TX=['#93c5fd','#86efac','#fcd34d','#c4b5fd','#5eead4','#fdba74'];
+var STATUS_COL={Implemented:'#22c55e','In Progress':'#3b82f6','POC Stage':'#14b8a6',Proposed:'#8b5cf6',New:'#f97316',Ideation:'#f59e0b'};
+var MONTHS=["Oct'25","Nov'25","Dec'25","Jan'26","Feb'26","Mar'26","Apr'26","May'26","June'26","July'26","Aug'26"];
+Chart.defaults.color='#5e6a82';
+Chart.defaults.borderColor='rgba(255,255,255,0.05)';
+
+// STATE
+var S={pods:[],members:[],ideas:[],sprints:[],training:{courses:[],status:{}},customFields:{member:[],idea:[]},isAdmin:true};
+var CHARTS={};
+
+// API
+function api(path,method,body){
+  method=method||'GET';
+  var opts={method:method,headers:{'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  var ctrl=new AbortController();
+  var timer=setTimeout(function(){ctrl.abort();},8000);
+  opts.signal=ctrl.signal;
+  return fetch(API_BASE+path,opts).then(function(r){
+    clearTimeout(timer);
+    if(!r.ok) return r.json().catch(function(){return {};}).then(function(e){throw new Error(e.error||'HTTP '+r.status);});
+    return r.json();
+  }).catch(function(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('Timeout - server not responding');
+    throw e;
+  });
+}
+
+function loadAll(){
+  setStat('loading','Loading...');
+  return Promise.all([
+    api('/pods'),api('/members'),api('/ideas'),api('/sprints'),
+    api('/training/courses'),api('/training/status'),api('/fields')
+  ]).then(function(res){
+    S.pods=res[0]; S.members=res[1]; S.ideas=res[2];
+    S.sprints=res[3].map(function(s){return Object.assign({},s,{member:s.member_id,targetIdeas:s.target_ideas});});
+    S.training={courses:res[4],status:res[5]};
+    S.customFields=res[6];
+    setStat('ok',S.members.length+'m / '+S.ideas.length+' ideas');
+    updateCounts();
+    populatePodFilters();
+    return true;
+  }).catch(function(e){
+    setStat('err','Server unreachable');
+    return false;
+  });
+}
+
+function setStat(state,label){
+  var dot=document.getElementById('api-dot');
+  var txt=document.getElementById('api-txt');
+  var cls={ok:'ok',loading:'loading',err:'err'};
+  if(dot){dot.className='sdot '+(cls[state]||'loading');}
+  if(txt) txt.textContent=label;
+}
+
+function checkHealth(){
+  api('/health').then(function(h){
+    setStat('ok',h.members+'m / '+h.ideas+'i / '+h.sprints+'s');
+    toast('Server OK','s');
+  }).catch(function(){setStat('err','Unreachable');toast('Server not reachable','e');});
+}
+
+// HELPERS
+function initials(n){return n.split(/[ ,]/).filter(Boolean).map(function(x){return x[0];}).join('').toUpperCase().slice(0,2);}
+function memberByID(id){return S.members.find(function(m){return m.id===String(id);});}
+function memberName(id){var m=memberByID(id);return m?m.name:String(id);}
+function podColor(code){var p=S.pods.find(function(x){return x.code===code;});if(p&&p.color) return p.color;var i=S.pods.findIndex(function(x){return x.code===code;});return PAL[Math.max(0,i)%PAL.length];}
+function avBG(name){var i=S.members.findIndex(function(m){return m.name===name;});return AV_BG[Math.max(0,i)%AV_BG.length];}
+function avFG(name){var i=S.members.findIndex(function(m){return m.name===name;});return AV_TX[Math.max(0,i)%AV_TX.length];}
+function statusBadge(st){var cls={Implemented:'bg','In Progress':'bb','POC Stage':'bt',Proposed:'bp',New:'bor',Ideation:'ba'};return '<span class="badge '+(cls[st]||'ba')+'">'+st+'</span>';}
+function implCount(id){return S.ideas.filter(function(i){return i.submitter===String(id)&&i.status==='Implemented';}).length;}
+function progCount(id){return S.ideas.filter(function(i){return i.submitter===String(id)&&i.status==='In Progress';}).length;}
+function updateCounts(){document.getElementById('nb-members').textContent=S.members.length;document.getElementById('nb-ideas').textContent=S.ideas.length;}
+function populatePodFilters(){
+  var opts='<option value="">All PODs</option>'+S.pods.map(function(p){return '<option value="'+p.code+'">'+p.code+' - '+p.name+'</option>';}).join('');
+  ['mem-pod-f','idea-pod-f','g-pod-f','sprint-pod-f','training-pod-f'].forEach(function(id){var s=document.getElementById(id);if(s)s.innerHTML=opts;});
+}
+function emptyState(msg){return '<div style="text-align:center;padding:40px;color:var(--mu)">'+msg+'</div>';}
+function toast(msg,t){
+  var w=document.getElementById('toastwrap');
+  var el=document.createElement('div');
+  el.className='tst '+(t||'s');
+  el.textContent=msg;
+  w.appendChild(el);
+  setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(60px)';el.style.transition='all .25s';setTimeout(function(){el.remove();},260);},2600);
+}
+function openModal(id){
+  if(id==='add-member'){document.getElementById('nm-pod').innerHTML=S.pods.map(function(p){return '<option value="'+p.code+'">'+p.code+' - '+p.name+'</option>';}).join('');renderCFInputs('nm','member');}
+  if(id==='add-idea'){document.getElementById('ni-submitter').innerHTML=S.members.map(function(m){return '<option value="'+m.id+'">'+m.name+' ('+m.id+')</option>';}).join('');renderCFInputs('ni','idea');}
+  if(id==='add-sprint'){document.getElementById('ns-member').innerHTML=S.members.map(function(m){return '<option value="'+m.id+'">'+m.name+'</option>';}).join('');document.getElementById('ns-edit-key').value='';document.getElementById('sprint-modal-title').textContent='Add Sprint Entry';}
+  document.getElementById('modal-'+id).classList.add('open');
+}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('open');}
+function toggleCFOpts(t){var p=t==='m'?'cfm':'cfi';document.getElementById(p+'-opts-wrap').style.display=document.getElementById(p+'-type').value==='select'?'block':'none';}
+function toggleRole(){S.isAdmin=!S.isAdmin;document.getElementById('role-lbl').textContent=S.isAdmin?'Admin':'View';document.getElementById('role-dot').style.background=S.isAdmin?'var(--green)':'var(--amber)';toast(S.isAdmin?'Admin mode':'View mode','i');}
+function downloadBackup(){window.open(API_BASE+'/backup','_blank');toast('Downloading backup...','i');}
+function renderCFInputs(prefix,type){
+  var w=document.getElementById(prefix+'-cf-fields');if(!w)return;
+  var fields=S.customFields[type]||[];
+  if(!fields.length){w.innerHTML='';return;}
+  w.innerHTML='<div class="dv"></div>'+fields.map(function(f){
+    var inp;
+    if(f.type==='select') inp='<select id="'+prefix+'-cf-'+f.id+'">'+(f.options||[]).map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>';
+    else if(f.type==='textarea') inp='<textarea id="'+prefix+'-cf-'+f.id+'" placeholder="'+f.label+'"></textarea>';
+    else inp='<input type="'+(f.type==='number'?'number':'text')+'" id="'+prefix+'-cf-'+f.id+'" placeholder="'+f.label+'">';
+    return '<div class="fr"><label class="fl">'+f.label+'</label>'+inp+'</div>';
+  }).join('');
+}
+function getCFVals(prefix,type){
+  var out={};
+  (S.customFields[type]||[]).forEach(function(f){var el=document.getElementById(prefix+'-cf-'+f.id);if(el)out[f.id]=el.value;});
+  return out;
+}
+
+// NAV
+function nav(id){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('sec-'+id).classList.add('active');
+  var ni=document.querySelector('.ni[onclick="nav(\''+id+'\')"]');if(ni)ni.classList.add('active');
+  var R={dashboard:renderDashboard,members:renderMembers,ideas:renderIdeas,sprints:renderSprints,training:renderTraining,graphs:renderGraphs,pods:renderPods,fields:renderCFLists,audit:renderAudit};
+  if(R[id]) R[id]();
+}
+
+// DASHBOARD
+function renderDashboard(){
+  var impl=S.ideas.filter(function(i){return i.status==='Implemented';}).length;
+  var inProg=S.ideas.filter(function(i){return i.status==='In Progress';}).length;
+  var totalTarget=S.members.reduce(function(a,m){return a+m.target;},0);
+  var pct=totalTarget?Math.round(impl/totalTarget*100):0;
+  var cards=S.members.slice(0,6).map(function(m){
+    var done=implCount(m.id);var pp=m.target?Math.min(100,Math.round(done/m.target*100)):0;var gap=m.target-done;
+    return '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--rl);padding:12px 14px;display:flex;align-items:center;gap:10px">'
+      +'<div class="av" style="background:'+avBG(m.name)+';color:'+avFG(m.name)+'">'+initials(m.name)+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.name.split(',')[0]+'</div>'
+      +'<div class="pbar"><div class="pbar-f" style="width:'+pp+'%;background:'+podColor(m.pod)+'"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:2px"><span>'+done+'/'+m.target+' ideas</span>'
+      +'<span style="color:'+(gap>6?'var(--red)':gap>0?'var(--amber)':'var(--green)')+'">'+pp+'%</span></div></div></div>';
+  }).join('');
+  document.getElementById('dash-con').innerHTML=
+    '<div class="g4" style="margin-bottom:14px">'
+    +'<div class="mc"><div class="mc-l">Total Ideas</div><div class="mc-v" style="color:var(--blue)">'+S.ideas.length+'</div><div class="mc-s">'+S.members.length+' members, '+S.pods.length+' POD(s)</div></div>'
+    +'<div class="mc"><div class="mc-l">Implemented</div><div class="mc-v" style="color:var(--green)">'+impl+'</div><div class="mc-s">of '+totalTarget+' target ('+pct+'%)</div><div class="mc-pb"><div class="mc-pf" style="width:'+pct+'%;background:var(--green)"></div></div></div>'
+    +'<div class="mc"><div class="mc-l">In Progress</div><div class="mc-v" style="color:var(--blue)">'+inProg+'</div><div class="mc-s">Active now</div></div>'
+    +'<div class="mc"><div class="mc-l">Remaining Gap</div><div class="mc-v" style="color:var(--amber)">'+(totalTarget-impl)+'</div><div class="mc-s">Ideas still needed</div></div>'
+    +'</div>'
+    +'<div class="g2" style="margin-bottom:14px">'
+    +'<div><div class="sh" style="margin-bottom:10px">Member Progress</div>'
+    +'<div style="display:flex;flex-direction:column;gap:8px">'+cards+'</div>'
+    +(S.members.length>6?'<div style="margin-top:8px;text-align:center"><button class="btn btn-sm" onclick="nav(\'members\')">View all '+S.members.length+' members</button></div>':'')+'</div>'
+    +'<div class="card"><div class="sh" style="margin-bottom:12px">Recent Ideas</div>'
+    +S.ideas.slice(0,6).map(function(i){return '<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--b1)"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(i.title||'Untitled')+'</div><div style="font-size:11px;color:var(--mu)">'+memberName(i.submitter)+'</div></div>'+statusBadge(i.status)+'</div>';}).join('')
+    +'<div style="margin-top:10px;text-align:center"><button class="btn btn-sm" onclick="nav(\'ideas\')">View all ideas</button></div></div></div>'
+    +'<div class="card"><div class="sh" style="margin-bottom:12px">Status Overview</div>'
+    +'<div class="g4">'+['Implemented','In Progress','POC Stage','Proposed'].map(function(x){var c=S.ideas.filter(function(i){return i.status===x;}).length;return '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:'+(STATUS_COL[x]||'#888')+';font-family:var(--mono)">'+c+'</div><div style="font-size:11px;color:var(--mu);margin-top:3px">'+x+'</div></div>';}).join('')+'</div></div>';
+}
+
+// MEMBERS
+function renderMembers(){
+  var podF=document.getElementById('mem-pod-f').value;
+  var data=podF?S.members.filter(function(m){return m.pod===podF;}):S.members;
+  data=data.slice().sort(function(a,b){return a.name.localeCompare(b.name);});
+  var cf=S.customFields.member||[];
+  if(!data.length){document.getElementById('members-con').innerHTML=emptyState('No members found');return;}
+  document.getElementById('members-con').innerHTML='<div class="tw"><table>'
+    +'<thead><tr><th>Member</th><th>Emp ID</th><th>POD</th><th>Service Line</th><th>Target</th><th>Implemented</th><th>In Progress</th><th>Gap</th>'
+    +cf.map(function(f){return '<th>'+f.label+'</th>';}).join('')
+    +(S.isAdmin?'<th>Actions</th>':'')+'</tr></thead><tbody>'
+    +data.map(function(m){
+      var done=implCount(m.id);var prog=progCount(m.id);var gap=m.target-done;var pp=m.target?Math.min(100,Math.round(done/m.target*100)):0;
+      return '<tr>'
+        +'<td><div style="display:flex;align-items:center;gap:9px"><div class="av" style="background:'+avBG(m.name)+';color:'+avFG(m.name)+'">'+initials(m.name)+'</div>'
+        +'<div><div style="font-size:12.5px;font-weight:500">'+m.name+'</div><div style="font-size:10px;color:var(--mu)">'+pp+'% complete</div></div></div></td>'
+        +'<td style="font-family:var(--mono);font-size:12px">'+m.id+'</td>'
+        +'<td><span class="badge" style="background:'+podColor(m.pod)+'22;color:'+podColor(m.pod)+'">'+m.pod+'</span></td>'
+        +'<td style="color:var(--mu2)">'+m.sl+'</td>'
+        +'<td style="font-family:var(--mono)">'+m.target+'</td>'
+        +'<td><span class="badge bg">'+done+'</span></td>'
+        +'<td><span class="badge bb">'+prog+'</span></td>'
+        +'<td><span class="badge '+(gap>6?'br':gap>0?'ba':'bg')+'">'+gap+'</span></td>'
+        +cf.map(function(f){return '<td style="color:var(--mu2);font-size:12px">'+(m.custom&&m.custom[f.id]||'-')+'</td>';}).join('')
+        +(S.isAdmin?'<td><div style="display:flex;gap:5px"><button class="btn btn-sm" onclick="openEditMember(\''+m.id+'\')">Edit</button><button class="btn btn-sm btn-d" onclick="delMember(\''+m.id+'\')">X</button></div></td>':'')
+        +'</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function openEditMember(id){
+  var m=S.members.find(function(x){return x.id===id;});if(!m)return;
+  document.getElementById('em-orig-id').value=id;
+  document.getElementById('em-name').value=m.name;
+  document.getElementById('em-id').value=m.id;
+  document.getElementById('em-sl').value=m.sl;
+  document.getElementById('em-target').value=m.target;
+  document.getElementById('em-pod').innerHTML=S.pods.map(function(p){return '<option value="'+p.code+'"'+(p.code===m.pod?' selected':'')+'>'+p.code+' - '+p.name+'</option>';}).join('');
+  var cf=S.customFields.member||[];
+  document.getElementById('em-cf-fields').innerHTML=cf.length?'<div class="dv"></div>'+cf.map(function(f){return '<div class="fr"><label class="fl">'+f.label+'</label><input type="text" id="em-cf-'+f.id+'" value="'+(m.custom&&m.custom[f.id]||'')+'" placeholder="'+f.label+'"></div>';}).join(''):'';
+  document.getElementById('modal-edit-member').classList.add('open');
+}
+function saveMember(){
+  var id=document.getElementById('em-orig-id').value;
+  var cf={};(S.customFields.member||[]).forEach(function(f){var el=document.getElementById('em-cf-'+f.id);if(el)cf[f.id]=el.value;});
+  api('/members/'+id,'PUT',{name:document.getElementById('em-name').value,pod:document.getElementById('em-pod').value,sl:document.getElementById('em-sl').value,target:parseInt(document.getElementById('em-target').value)||12,custom:cf})
+  .then(function(){return loadAll();}).then(function(){closeModal('edit-member');renderMembers();toast('Member updated!','s');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function addMember(){
+  var name=document.getElementById('nm-name').value.trim();var id=document.getElementById('nm-id').value.trim();
+  if(!name||!id){toast('Name and ID required','e');return;}
+  api('/members','POST',{id:id,name:name,pod:document.getElementById('nm-pod').value,sl:document.getElementById('nm-sl').value,target:parseInt(document.getElementById('nm-target').value)||12,custom:getCFVals('nm','member')})
+  .then(function(){return loadAll();}).then(function(){closeModal('add-member');renderMembers();toast('Member added!','s');document.getElementById('nm-name').value='';document.getElementById('nm-id').value='';}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function delMember(id){
+  if(!confirm('Remove this member?')) return;
+  api('/members/'+id,'DELETE').then(function(){return loadAll();}).then(function(){renderMembers();toast('Removed','i');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// IDEAS
+
+// Resolve comma-separated contributor IDs to member objects
+function resolveContributorNames(contributorsStr){
+  if(!contributorsStr) return [];
+  return String(contributorsStr).split(',').map(function(raw){
+    raw=raw.trim();
+    if(!raw) return null;
+    var member=memberByID(raw);
+    return {raw:raw,member:member,name:member?member.name:raw};
+  }).filter(Boolean);
+}
+function renderIdeas(){
+  var stF=document.getElementById('idea-status-f').value;
+  var podF=document.getElementById('idea-pod-f').value;
+  var data=S.ideas.slice();
+  if(stF) data=data.filter(function(i){return i.status===stF;});
+  if(podF){
+    var mids=S.members.filter(function(m){return m.pod===podF;}).map(function(m){return m.id;});
+    data=data.filter(function(i){return mids.indexOf(i.submitter)>=0;});
+  }
+  // Sort by contributor name A-Z (first contributor resolved to full name)
+  data.sort(function(a,b){
+    var cA=resolveContributorNames(a.contributors);
+    var cB=resolveContributorNames(b.contributors);
+    var nameA=cA.length?cA[0].name:'';
+    var nameB=cB.length?cB[0].name:'';
+    return nameA.localeCompare(nameB);
+  });
+  var cf=S.customFields.idea||[];
+  if(!data.length){document.getElementById('ideas-con').innerHTML=emptyState('No ideas found');return;}
+  document.getElementById('ideas-con').innerHTML='<div class="tw"><table>'
+    +'<thead><tr>'
+    +'<th>#</th>'
+    +'<th>Title / Problem</th>'
+    +'<th>Submitter</th>'
+    +'<th>Status</th>'
+    +'<th>Contributors</th>'
+    +cf.map(function(f){return '<th>'+f.label+'</th>';}).join('')
+    +'<th>Actions</th>'
+    +'</tr></thead><tbody>'
+    +data.map(function(idea,idx){
+      var sub=memberByID(idea.submitter);
+      // Submitter: full name + avatar
+      var subHtml=sub
+        ?('<div style="display:flex;align-items:center;gap:6px">'
+          +'<div class="av" style="width:26px;height:26px;font-size:9px;background:'+avBG(sub.name)+';color:'+avFG(sub.name)+'">'+initials(sub.name)+'</div>'
+          +'<div>'
+          +'<div style="font-size:12px;font-weight:500">'+sub.name+'</div>'
+          +'<div style="font-size:10px;color:var(--mu)">'+sub.pod+'</div>'
+          +'</div></div>')
+        :('<span style="color:var(--mu);font-size:12px">'+idea.submitter+'</span>');
+      // Contributors: resolve IDs to full names with avatars
+      var contribs=resolveContributorNames(idea.contributors);
+      var contribHtml=contribs.length
+        ?('<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'
+          +contribs.map(function(c){
+            return c.member
+              ?('<div class="av" style="width:24px;height:24px;font-size:9px;background:'+avBG(c.member.name)+';color:'+avFG(c.member.name)+'" title="'+c.member.name+'">'+initials(c.member.name)+'</div>')
+              :('<span style="font-size:11px;color:var(--mu);background:var(--s3);padding:2px 6px;border-radius:4px">'+c.raw+'</span>');
+          }).join('')
+          +'<span style="font-size:11px;color:var(--mu2);margin-left:2px">'
+          +contribs.map(function(c){return c.member?c.member.name:c.raw;}).join(', ')
+          +'</span>'
+          +'</div>')
+        :'<span style="color:var(--mu)">-</span>';
+      return '<tr>'
+        +'<td style="font-family:var(--mono);font-size:11px;color:var(--mu)">'+(idx+1)+'</td>'
+        +'<td style="max-width:240px">'
+          +'<div style="font-weight:500;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px">'+(idea.title||'-')+'</div>'
+          +'<div style="font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px">'+(idea.problem||'')+'</div>'
+        +'</td>'
+        +'<td style="min-width:140px">'+subHtml+'</td>'
+        +'<td>'+statusBadge(idea.status)+'</td>'
+        +'<td style="min-width:160px">'+contribHtml+'</td>'
+        +cf.map(function(f){return '<td style="font-size:12px;color:var(--mu2)">'+(idea.custom&&idea.custom[f.id]||'-')+'</td>';}).join('')
+        +'<td><div style="display:flex;gap:5px">'
+          +'<button class="btn btn-sm" data-id="'+idea.id+'" onclick="viewIdea(this.dataset.id)">View</button>'
+          +(S.isAdmin
+            ?'<button class="btn btn-sm" data-id="'+idea.id+'" onclick="openEditIdea(this.dataset.id)">Edit</button>'
+             +'<button class="btn btn-sm btn-d" data-id="'+idea.id+'" onclick="delIdea(this.dataset.id)">X</button>'
+            :'')
+        +'</div></td>'
+        +'</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function viewIdea(id){
+  var i=S.ideas.find(function(x){return x.id===id;});if(!i)return;
+  var sub=memberByID(i.submitter);
+  var contribs=resolveContributorNames(i.contributors);
+  var contribNames=contribs.map(function(c){return c.member?c.member.name:c.raw;}).join(', ');
+  document.getElementById('vi-title').textContent=i.title||'Untitled';
+  document.getElementById('vi-badge').innerHTML=statusBadge(i.status);
+  document.getElementById('vi-body').innerHTML=
+    '<div style="margin-bottom:12px"><strong style="color:var(--tx)">Problem Statement</strong><div style="margin-top:4px;color:var(--mu2)">'+(i.problem||'-')+'</div></div>'
+    +'<div style="margin-bottom:12px"><strong style="color:var(--tx)">Description</strong><div style="margin-top:4px;color:var(--mu2)">'+(i.description||i.desc||'-')+'</div></div>'
+    +'<div style="margin-bottom:8px"><strong style="color:var(--tx)">Submitter:</strong> <span style="color:var(--mu2)">'+(sub?sub.name+' ('+sub.id+')':i.submitter)+'</span></div>'
+    +'<div style="margin-bottom:6px"><strong style="color:var(--tx)">Contributors:</strong> <span style="color:var(--mu2)">'+(contribNames||'-')+'</span></div>'
+    +(S.customFields.idea||[]).map(function(f){return i.custom&&i.custom[f.id]?'<div style="margin-top:6px"><strong style="color:var(--tx)">'+f.label+':</strong> '+i.custom[f.id]+'</div>':'';}).join('');
+  document.getElementById('vi-edit-btn').onclick=function(){closeModal('view-idea');openEditIdea(id);};
+  document.getElementById('modal-view-idea').classList.add('open');
+}
+function openEditIdea(id){
+  var i=S.ideas.find(function(x){return x.id===id;});if(!i)return;
+  document.getElementById('ei-id').value=id;
+  document.getElementById('ei-title').value=i.title||'';
+  document.getElementById('ei-status').value=i.status;
+  document.getElementById('ei-problem').value=i.problem||'';
+  document.getElementById('ei-desc').value=i.description||i.desc||'';
+  var cf=S.customFields.idea||[];
+  document.getElementById('ei-cf-fields').innerHTML=cf.length?'<div class="dv"></div>'+cf.map(function(f){return '<div class="fr"><label class="fl">'+f.label+'</label><input type="text" id="ei-cf-'+f.id+'" value="'+(i.custom&&i.custom[f.id]||'')+'" placeholder="'+f.label+'"></div>';}).join(''):'';
+  document.getElementById('modal-edit-idea').classList.add('open');
+}
+function saveIdea(){
+  var id=document.getElementById('ei-id').value;
+  var cf={};(S.customFields.idea||[]).forEach(function(f){var el=document.getElementById('ei-cf-'+f.id);if(el)cf[f.id]=el.value;});
+  api('/ideas/'+id,'PUT',{title:document.getElementById('ei-title').value,status:document.getElementById('ei-status').value,problem:document.getElementById('ei-problem').value,desc:document.getElementById('ei-desc').value,custom:cf})
+  .then(function(){return loadAll();}).then(function(){closeModal('edit-idea');renderIdeas();toast('Idea updated!','s');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function addIdea(){
+  var title=document.getElementById('ni-title').value.trim();
+  if(!title){toast('Title required','e');return;}
+  api('/ideas','POST',{title:title,problem:document.getElementById('ni-problem').value,desc:document.getElementById('ni-desc').value,submitter:document.getElementById('ni-submitter').value,contributors:document.getElementById('ni-contribs').value,status:document.getElementById('ni-status').value,custom:getCFVals('ni','idea')})
+  .then(function(){return loadAll();}).then(function(){closeModal('add-idea');renderIdeas();toast('Idea added!','s');['ni-title','ni-problem','ni-desc','ni-contribs'].forEach(function(x){var e=document.getElementById(x);if(e)e.value='';});}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function delIdea(id){
+  if(!confirm('Remove this idea?')) return;
+  api('/ideas/'+id,'DELETE').then(function(){return loadAll();}).then(function(){renderIdeas();toast('Removed','i');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// SPRINTS
+function renderSprints(){
+  var podF=document.getElementById('sprint-pod-f')?document.getElementById('sprint-pod-f').value:'';
+  // Get member IDs belonging to the selected POD
+  var podMemberIds=podF?S.members.filter(function(m){return m.pod===podF;}).map(function(m){return m.id;}):null;
+  // Filter sprints by POD
+  var filtered=podMemberIds?S.sprints.filter(function(s){return podMemberIds.indexOf(s.member)>=0;}):S.sprints;
+  var spNames=[...new Set(filtered.map(function(s){return s.sprint;}))].sort();
+  var tC=filtered.reduce(function(a,b){return a+b.committed;},0);
+  var tD=filtered.reduce(function(a,b){return a+b.completed;},0);
+  var pct=tC?Math.round(tD/tC*100):0;
+  if(!filtered.length){
+    document.getElementById('sprints-con').innerHTML=emptyState(podF?'No sprint data for '+podF+' POD yet.':'No sprint entries yet. Click + Add Entry to begin.');
+    return;
+  }
+  var podLabel=podF?' ('+podF+')':'';
+  var tabHtml=spNames.map(function(sp,i){
+    return '<span class="stab'+(i===0?' active':'')+'" data-sprint="'+sp+'" data-pod="'+podF+'" onclick="spTabClick(this)">'+sp+'</span>';
+  }).join('');
+  document.getElementById('sprints-con').innerHTML=
+    '<div class="g3" style="margin-bottom:14px">'
+    +'<div class="mc"><div class="mc-l">Committed SP'+podLabel+'</div><div class="mc-v" style="color:var(--blue)">'+tC+'</div><div class="mc-s">Across '+spNames.length+' sprint(s)</div></div>'
+    +'<div class="mc"><div class="mc-l">Completed SP'+podLabel+'</div><div class="mc-v" style="color:var(--green)">'+tD+'</div><div class="mc-s">'+(tC?Math.round(tD/tC*100):0)+'% delivery rate</div></div>'
+    +'<div class="mc"><div class="mc-l">Completion Rate</div><div class="mc-v" style="color:'+(pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)')+'">'+pct+'%</div>'
+    +'<div class="mc-pb"><div class="mc-pf" style="width:'+pct+'%;background:'+(pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)')+'"></div></div></div>'
+    +'</div>'
+    +'<div id="sprint-tabs" style="margin-bottom:14px">'+tabHtml+'</div>'
+    +'<div id="sprint-detail"></div>';
+  selectSprint(spNames[0], podF);
+}
+// Tab click handler - uses data attribute, no quote issues
+function spTabClick(el){
+  document.querySelectorAll('.stab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  selectSprint(el.dataset.sprint, el.dataset.pod||'');
+}
+function selectSprint(sprint, podF){
+  podF=podF||'';
+  var podMemberIds=podF?S.members.filter(function(m){return m.pod===podF;}).map(function(m){return m.id;}):null;
+  var data=S.sprints.filter(function(s){
+    if(s.sprint!==sprint) return false;
+    if(podMemberIds&&podMemberIds.indexOf(s.member)<0) return false;
+    return true;
+  });
+  // Sort by member name A-Z
+  data=data.slice().sort(function(a,b){
+    var ma=memberByID(a.member);var mb=memberByID(b.member);
+    return (ma?ma.name:'').localeCompare(mb?mb.name:'');
+  });
+  var tC=data.reduce(function(a,b){return a+b.committed;},0);
+  var tD=data.reduce(function(a,b){return a+b.completed;},0);
+  var pct=tC?Math.round(tD/tC*100):0;
+  var rows=data.map(function(s){
+    var m=memberByID(s.member);
+    var pp=s.committed?Math.min(100,Math.round(s.completed/s.committed*100)):0;
+    // Use data attributes for both member and sprint to avoid apostrophe issues
+    return '<tr>'
+      +'<td><div style="display:flex;align-items:center;gap:8px">'
+      +(m?'<div class="av" style="width:26px;height:26px;font-size:10px;background:'+avBG(m.name)+';color:'+avFG(m.name)+'">'+initials(m.name)+'</div>'+m.name
+        :'<span style="color:var(--mu)">'+s.member+'</span>')
+      +'</div></td>'
+      +'<td>'+(m?'<span class="badge" style="background:'+podColor(m.pod)+'22;color:'+podColor(m.pod)+'">'+m.pod+'</span>':'')+'</td>'
+      +'<td style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--blue)">'+s.committed+'</td>'
+      +'<td style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green)">'+s.completed+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:7px">'
+      +'<div style="width:60px;height:5px;background:var(--s3);border-radius:3px;overflow:hidden">'
+      +'<div style="width:'+pp+'%;height:100%;background:'+(pp>=80?'var(--green)':pp>=50?'var(--amber)':'var(--red)')+'"></div></div>'
+      +'<span style="font-size:11px;color:var(--mu)">'+pp+'%</span></div></td>'
+      +'<td style="font-family:var(--mono)">'+(s.targetIdeas||0)+'</td>'
+      +'<td style="font-size:11px;color:var(--mu2)">'+(s.comments||'-')+'</td>'
+      +(S.isAdmin
+        ?'<td><button class="btn btn-sm" data-member="'+s.member+'" data-sprint="'+s.sprint+'" onclick="openEditSprint(this.dataset.member,this.dataset.sprint)">Edit</button></td>'
+        :'')
+      +'</tr>';
+  }).join('');
+  document.getElementById('sprint-detail').innerHTML=
+    '<div class="card">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div><div style="font-size:15px;font-weight:700">'+sprint+'</div>'
+    +'<div style="font-size:11px;color:var(--mu);margin-top:2px">'+data.length+' members | '+tC+' committed | '+tD+' completed</div></div>'
+    +'<div style="display:flex;gap:6px"><span class="badge bb">'+tC+' Committed</span><span class="badge bg">'+tD+' Completed</span></div>'
+    +'</div>'
+    +'<div class="pbar" style="height:8px;margin-bottom:14px"><div class="pbar-f" style="width:'+pct+'%;background:var(--green)"></div></div>'
+    +'<div class="tw"><table>'
+    +'<thead><tr><th>Member</th><th>POD</th>'
+    +'<th style="background:rgba(59,130,246,.08);color:var(--blue)">Committed SP</th>'
+    +'<th style="background:rgba(34,197,94,.08);color:var(--green)">Completed SP</th>'
+    +'<th>Completion</th><th>Idea Target</th><th>Comments</th>'
+    +(S.isAdmin?'<th>Edit</th>':'')
+    +'</tr></thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'</table></div>'
+    +'</div>';
+}
+function openEditSprint(memberId, sprint){
+  var s=S.sprints.find(function(x){return x.member===memberId&&x.sprint===sprint;});
+  if(!s)return;
+  document.getElementById('ns-edit-key').value=memberId+'|'+sprint;
+  document.getElementById('sprint-modal-title').textContent='Edit Sprint: '+sprint;
+  document.getElementById('ns-member').innerHTML=S.members.map(function(m){
+    return '<option value="'+m.id+'"'+(m.id===memberId?' selected':'')+'>'+m.name+'</option>';
+  }).join('');
+  document.getElementById('ns-sprint').value=sprint;
+  document.getElementById('ns-committed').value=s.committed;
+  document.getElementById('ns-completed').value=s.completed;
+  document.getElementById('ns-target-ideas').value=s.targetIdeas||0;
+  document.getElementById('ns-comments').value=s.comments||'';
+  document.getElementById('modal-add-sprint').classList.add('open');
+}
+function saveSprintEntry(){
+  var member=document.getElementById('ns-member').value;
+  var sprint=document.getElementById('ns-sprint').value.trim();
+  if(!member||!sprint){toast('Member and Sprint required','e');return;}
+  var body={member:member,sprint:sprint,
+    committed:parseFloat(document.getElementById('ns-committed').value)||0,
+    completed:parseFloat(document.getElementById('ns-completed').value)||0,
+    targetIdeas:parseFloat(document.getElementById('ns-target-ideas').value)||0,
+    comments:document.getElementById('ns-comments').value};
+  api('/sprints','POST',body)
+    .then(function(){return loadAll();})
+    .then(function(){
+      closeModal('add-sprint');
+      renderSprints();
+      // Re-activate the sprint tab that was being edited/added
+      setTimeout(function(){
+        var tabs=document.querySelectorAll('.stab');
+        var target=sprint;
+        var podF=document.getElementById('sprint-pod-f')?document.getElementById('sprint-pod-f').value:'';
+        tabs.forEach(function(t){
+          if(t.dataset.sprint===target){
+            t.classList.add('active');
+            selectSprint(target,podF);
+          }
+        });
+      },50);
+      toast('Sprint entry saved!','s');
+    })
+    .catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// TRAINING
+function renderTraining(){
+  var podF=document.getElementById('training-pod-f')?document.getElementById('training-pod-f').value:'';
+  var courses=S.training.courses||[];
+  var status=S.training.status||{};
+  if(!courses.length){
+    document.getElementById('training-con').innerHTML=emptyState('No courses yet. Click + Add Course to begin.');
+    return;
+  }
+  // Filter members by POD, then sort A-Z by name
+  var members=podF?S.members.filter(function(m){return m.pod===podF;}):S.members;
+  members=members.slice().sort(function(a,b){return a.name.localeCompare(b.name);});
+  if(!members.length){
+    document.getElementById('training-con').innerHTML=emptyState('No members found for this POD.');
+    return;
+  }
+  // Status colour mapping
+  var stColor={Completed:'var(--green)','In-Progress':'var(--blue)','Yet Start':'var(--amber)',Error:'var(--red)',Select:'var(--purple)'};
+  document.getElementById('training-con').innerHTML=
+    '<div class="tw"><table>'
+    +'<thead><tr>'
+    +'<th>Member</th><th>Emp ID</th><th>POD</th>'
+    +courses.map(function(c){
+      return '<th style="background:rgba(59,130,246,.08);color:var(--blue);text-align:center">'+c.id+'<br><span style="font-size:9px;font-weight:400;color:var(--mu)">'+c.name+'</span></th>';
+    }).join('')
+    +'</tr></thead><tbody>'
+    +members.map(function(m){
+      return '<tr>'
+        +'<td><div style="display:flex;align-items:center;gap:8px">'
+        +'<div class="av" style="width:26px;height:26px;font-size:10px;background:'+avBG(m.name)+';color:'+avFG(m.name)+'">'+initials(m.name)+'</div>'
+        +m.name+'</div></td>'
+        +'<td style="font-family:var(--mono);font-size:12px">'+m.id+'</td>'
+        +'<td><span class="badge" style="background:'+podColor(m.pod)+'22;color:'+podColor(m.pod)+'">'+m.pod+'</span></td>'
+        +courses.map(function(c){
+          var st=(status[m.id]||{})[c.id]||'';
+          var col=stColor[st]||'var(--mu)';
+          return '<td style="text-align:center">'
+            +'<select style="width:auto;padding:3px 8px;font-size:11px;border-color:'+(st?col+'55':'')+(st?';color:'+col:'')+';" '
+            +'data-member="'+m.id+'" data-course="'+c.id+'" onchange="updateTraining(this.dataset.member,this.dataset.course,this.value)"'
+            +(S.isAdmin?'':' disabled')+'>'
+            +'<option value="">-</option>'
+            +['Completed','In-Progress','Yet Start','Select','Error'].map(function(o){
+              return '<option value="'+o+'"'+(o===st?' selected':'')+'>'+o+'</option>';
+            }).join('')
+            +'</select></td>';
+        }).join('')
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div>';
+}
+function updateTraining(mid,cid,val){
+  api('/training/status','POST',{memberId:mid,courseId:cid,status:val})
+  .then(function(){if(!S.training.status[mid])S.training.status[mid]={};S.training.status[mid][cid]=val;})
+  .catch(function(e){toast('Error: '+e.message,'e');});
+}
+function addCourse(){
+  var id=document.getElementById('nc-id').value.trim();var name=document.getElementById('nc-name').value.trim();
+  if(!id){toast('Course ID required','e');return;}
+  api('/training/courses','POST',{id:id,name:name||id})
+  .then(function(){return loadAll();}).then(function(){closeModal('add-course');renderTraining();toast('Course added!','s');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// GRAPHS
+function mkCH(id,cfg){if(CHARTS[id]){CHARTS[id].destroy();delete CHARTS[id];}var c=document.getElementById(id);if(!c)return;CHARTS[id]=new Chart(c,cfg);return CHARTS[id];}
+var CHBASE={plugins:{legend:{labels:{color:'#5e6a82',font:{family:"'Inter',sans-serif",size:11},boxWidth:10,padding:12}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5e6a82',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5e6a82',font:{size:11}}}}};
+
+function renderGraphs(){
+  var podF=document.getElementById('g-pod-f').value;
+  var members=podF?S.members.filter(function(m){return m.pod===podF;}):S.members;
+  var ideas=podF?S.ideas.filter(function(i){return members.some(function(m){return m.id===i.submitter;});}):S.ideas;
+  var sprints=podF?S.sprints.filter(function(s){return members.some(function(m){return m.id===s.member;});}):S.sprints;
+  var spNames=[...new Set(sprints.map(function(s){return s.sprint;}))].sort();
+
+  // 1. Committed vs Completed
+  mkCH('ch-sp-sprint',{type:'bar',data:{labels:spNames,datasets:[
+    {label:'Committed SP',data:spNames.map(function(sp){return sprints.filter(function(s){return s.sprint===sp;}).reduce(function(a,b){return a+b.committed;},0);}),backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',borderWidth:2,borderRadius:5},
+    {label:'Completed SP',data:spNames.map(function(sp){return sprints.filter(function(s){return s.sprint===sp;}).reduce(function(a,b){return a+b.completed;},0);}),backgroundColor:'rgba(34,197,94,.2)',borderColor:'#22c55e',borderWidth:2,borderRadius:5}
+  ]},options:Object.assign({},CHBASE,{interaction:{mode:'index',intersect:false}})});
+
+  // 2. Status donut
+  var statuses=[...new Set(ideas.map(function(i){return i.status;}))];
+  mkCH('ch-status-pie',{type:'doughnut',data:{labels:statuses,datasets:[{data:statuses.map(function(s){return ideas.filter(function(i){return i.status===s;}).length;}),backgroundColor:statuses.map(function(s){return (STATUS_COL[s]||'#888')+'55';}),borderColor:statuses.map(function(s){return STATUS_COL[s]||'#888';}),borderWidth:2}]},options:{cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#5e6a82',font:{size:11},padding:10,boxWidth:10}}}}});
+
+  // 3. Member progress
+  var top=members.slice(0,12);
+  mkCH('ch-member-prog',{type:'bar',data:{labels:top.map(function(m){return m.name.split(',')[0];}),datasets:[
+    {label:'Implemented',data:top.map(function(m){return implCount(m.id);}),backgroundColor:'rgba(34,197,94,.2)',borderColor:'#22c55e',borderWidth:1.5,borderRadius:4},
+    {label:'In Progress',data:top.map(function(m){return progCount(m.id);}),backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',borderWidth:1.5,borderRadius:4},
+    {label:'Target',data:top.map(function(m){return m.target;}),backgroundColor:'rgba(255,255,255,.04)',borderColor:'rgba(255,255,255,.15)',borderWidth:1,borderRadius:4}
+  ]},options:Object.assign({},CHBASE,{indexAxis:'y',interaction:{mode:'y',intersect:false},scales:{x:CHBASE.scales.x,y:{grid:{display:false},ticks:{color:'#5e6a82',font:{size:11}}}}})});
+
+  // 4. Monthly delivery
+  var spByMon=MONTHS.map(function(mo){return sprints.filter(function(s){return s.sprint===mo;}).reduce(function(a,b){return a+b.completed;},0);});
+  mkCH('ch-monthly',{type:'line',data:{labels:MONTHS,datasets:[{label:'Completed SP',data:spByMon,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,.15)',fill:true,tension:.4,pointRadius:4,borderWidth:2}]},options:CHBASE});
+
+  // 5. By POD
+  mkCH('ch-pod-pie',{type:'pie',data:{labels:S.pods.map(function(p){return p.code;}),datasets:[{data:S.pods.map(function(p){var mids=S.members.filter(function(m){return m.pod===p.code;}).map(function(m){return m.id;});return ideas.filter(function(i){return mids.includes(i.submitter);}).length;}),backgroundColor:S.pods.map(function(p,i){return (p.color||PAL[i%PAL.length])+'55';}),borderColor:S.pods.map(function(p,i){return p.color||PAL[i%PAL.length];}),borderWidth:2}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#5e6a82',font:{size:11},padding:10,boxWidth:10}}}}});
+
+  // 6. Target vs actual
+  var tm=members.slice(0,10);
+  mkCH('ch-target-actual',{type:'bar',data:{labels:tm.map(function(m){return m.name.split(',')[0];}),datasets:[
+    {label:'Target',data:tm.map(function(m){return m.target;}),backgroundColor:'rgba(255,255,255,.05)',borderColor:'rgba(255,255,255,.2)',borderWidth:1,borderRadius:4},
+    {label:'Actual',data:tm.map(function(m){return implCount(m.id);}),backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',borderWidth:1.5,borderRadius:4}
+  ]},options:CHBASE});
+
+  // 7. Stages bar
+  var stages=['New','Ideation','In Progress','POC Stage','Proposed','Implemented'];
+  mkCH('ch-stages',{type:'bar',data:{labels:stages,datasets:[{label:'Ideas',data:stages.map(function(s){return ideas.filter(function(i){return i.status===s;}).length;}),backgroundColor:stages.map(function(s){return (STATUS_COL[s]||'#888')+'33';}),borderColor:stages.map(function(s){return STATUS_COL[s]||'#888';}),borderWidth:2,borderRadius:5}]},options:Object.assign({},CHBASE,{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#5e6a82',font:{size:10}}},y:CHBASE.scales.y}})});
+}
+
+// PODS
+function renderPods(){
+  if(!S.pods.length){document.getElementById('pods-con').innerHTML=emptyState('No PODs yet. Add one above.');return;}
+  var sortedPods=S.pods.slice().sort(function(a,b){return a.code.localeCompare(b.code);});
+  document.getElementById('pods-con').innerHTML='<div class="g3">'+sortedPods.map(function(p,i){
+    var mems=S.members.filter(function(m){return m.pod===p.code;});
+    var impl=mems.reduce(function(a,m){return a+implCount(m.id);},0);
+    var inPr=mems.reduce(function(a,m){return a+progCount(m.id);},0);
+    var target=mems.reduce(function(a,m){return a+m.target;},0);
+    var pct=target?Math.min(100,Math.round(impl/target*100)):0;
+    var col=p.color||PAL[i%PAL.length];
+    return '<div class="card">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+      +'<div style="width:12px;height:12px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+      +'<div style="font-size:15px;font-weight:700">'+p.code+'</div>'
+      +'<div style="font-size:12px;color:var(--mu);flex:1">'+p.name+'</div>'
+      +(S.isAdmin?'<div style="display:flex;gap:5px"><button class="btn btn-sm" data-pod="'+p.code+'" onclick="openEditPOD(this.dataset.pod)">Edit</button><button class="btn btn-sm btn-d" data-pod="'+p.code+'" onclick="delPOD(this.dataset.pod)">X</button></div>':'')
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--mu);margin-bottom:12px">Service Line: '+p.sl+'</div>'
+      +'<div class="g3" style="gap:8px;margin-bottom:12px">'
+      +'<div class="mc" style="padding:10px 12px"><div class="mc-l" style="font-size:9px">Members</div><div style="font-size:22px;font-weight:700;font-family:var(--mono);color:'+col+'">'+mems.length+'</div></div>'
+      +'<div class="mc" style="padding:10px 12px"><div class="mc-l" style="font-size:9px">Implemented</div><div style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--green)">'+impl+'</div></div>'
+      +'<div class="mc" style="padding:10px 12px"><div class="mc-l" style="font-size:9px">In Progress</div><div style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--blue)">'+inPr+'</div></div>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">'
+      +'<span style="color:var(--mu)">Progress: '+impl+' / '+target+' ideas</span>'
+      +'<span style="font-weight:600;color:'+(pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)')+'">'+pct+'%</span>'
+      +'</div>'
+      +'<div class="pbar" style="height:8px;margin-bottom:12px"><div class="pbar-f" style="width:'+pct+'%;background:'+col+'"></div></div>'
+      +'<div style="font-size:10px;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Team</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:5px">'
+      +mems.map(function(m){var d=implCount(m.id);var pp=m.target?Math.min(100,Math.round(d/m.target*100)):0;return '<div class="av" style="width:30px;height:30px;font-size:10px;background:'+avBG(m.name)+';color:'+avFG(m.name)+';border:2px solid '+(pp>=100?'var(--green)':pp>0?'var(--amber)':'transparent')+';" title="'+m.name+': '+d+'/'+m.target+'">'+initials(m.name)+'</div>';}).join('')
+      +(mems.length===0?'<div style="font-size:12px;color:var(--mu);font-style:italic">No members yet</div>':'')
+      +'</div></div>';
+  }).join('')+'</div>';
+}
+function openEditPOD(code){
+  var p=S.pods.find(function(x){return x.code===code;});if(!p)return;
+  document.getElementById('ep-code').value=code;
+  document.getElementById('ep-code-display').value=code;
+  document.getElementById('ep-name').value=p.name;
+  document.getElementById('ep-sl').value=p.sl;
+  document.getElementById('ep-color').value=p.color||'#3b82f6';
+  document.getElementById('modal-edit-pod').classList.add('open');
+}
+function savePOD(){
+  var code=document.getElementById('ep-code').value;
+  api('/pods/'+code,'PUT',{name:document.getElementById('ep-name').value,sl:document.getElementById('ep-sl').value,color:document.getElementById('ep-color').value})
+  .then(function(){return loadAll();}).then(function(){closeModal('edit-pod');renderPods();toast('POD updated!','s');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function addPOD(){
+  var code=document.getElementById('np-code').value.trim().toUpperCase();
+  if(!code){toast('POD code required','e');return;}
+  api('/pods','POST',{code:code,name:document.getElementById('np-name').value.trim()||code,sl:document.getElementById('np-sl').value,color:document.getElementById('np-color').value})
+  .then(function(){return loadAll();}).then(function(){closeModal('add-pod');renderPods();populatePodFilters();toast('POD added!','s');document.getElementById('np-code').value='';document.getElementById('np-name').value='';}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function delPOD(code){
+  if(S.members.some(function(m){return m.pod===code;})){toast('Cannot remove: POD has members','e');return;}
+  if(!confirm('Remove POD '+code+'?')) return;
+  api('/pods/'+code,'DELETE').then(function(){return loadAll();}).then(function(){renderPods();populatePodFilters();toast('POD removed','i');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// CUSTOM FIELDS
+function renderCFLists(){
+  ['member','idea'].forEach(function(type){
+    var el=document.getElementById('cf-'+type+'-list');
+    var fields=S.customFields[type]||[];
+    el.innerHTML=fields.length?fields.map(function(f){return '<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--b1)"><span style="flex:1;font-size:12.5px;font-weight:500">'+f.label+'</span><span class="badge bb">'+f.type+'</span>'+(f.options&&f.options.length?'<span style="font-size:11px;color:var(--mu)">'+f.options.join(', ')+'</span>':'')+'<button class="btn btn-sm btn-d" onclick="delCF(\''+f.id+'\')">X</button></div>';}).join(''):'<div style="color:var(--mu);font-size:12px;padding:8px 0">No custom fields yet.</div>';
+  });
+}
+function addCF(type){
+  var p=type==='member'?'cfm':'cfi';
+  var label=document.getElementById(p+'-label').value.trim();
+  var ft=document.getElementById(p+'-type').value;
+  if(!label){toast('Label required','e');return;}
+  var opts=ft==='select'?document.getElementById(p+'-opts').value.split(',').map(function(x){return x.trim();}).filter(Boolean):[];
+  if(ft==='select'&&!opts.length){toast('Add at least one option','e');return;}
+  api('/fields','POST',{entity:type,label:label,type:ft,options:opts})
+  .then(function(){return loadAll();}).then(function(){renderCFLists();toast('Field added!','s');document.getElementById(p+'-label').value='';}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+function delCF(id){
+  api('/fields/'+id,'DELETE').then(function(){return loadAll();}).then(function(){renderCFLists();toast('Field removed','i');}).catch(function(e){toast('Error: '+e.message,'e');});
+}
+
+// AUDIT
+function renderAudit(){
+  var aCols={CREATE:'var(--green)',UPDATE:'var(--blue)',DELETE:'var(--red)',UPSERT:'var(--amber)'};
+  api('/audit').then(function(rows){
+    document.getElementById('audit-con').innerHTML=rows.length?'<div class="tw"><table><thead><tr><th>Time</th><th>Action</th><th>Entity</th><th>ID</th></tr></thead><tbody>'
+      +rows.map(function(r){return '<tr><td style="font-family:var(--mono);font-size:11px;color:var(--mu)">'+r.ts+'</td><td><span class="badge" style="background:'+(aCols[r.action]||'#888')+'22;color:'+(aCols[r.action]||'#888')+'">'+r.action+'</span></td><td style="font-size:12px">'+r.entity+'</td><td style="font-family:var(--mono);font-size:12px;color:var(--mu2)">'+r.entity_id+'</td></tr>';}).join('')
+      +'</tbody></table></div>':emptyState('No audit entries yet');
+  }).catch(function(){document.getElementById('audit-con').innerHTML=emptyState('Could not load audit log');});
+}
+
+// EXPORT
+function exportCSV(view){
+  var header,rows,fn;
+  if(view==='members'){header=['Emp ID','Name','POD','Service Line','Target','Implemented','In Progress','Gap'];rows=S.members.map(function(m){return [m.id,m.name,m.pod,m.sl,m.target,implCount(m.id),progCount(m.id),m.target-implCount(m.id)];});fn='members.csv';}
+  else if(view==='ideas'){
+  header=['Title','Status','Submitter','Contributors','Problem'];
+  rows=S.ideas.slice().sort(function(a,b){
+    var cA=resolveContributorNames(a.contributors);var cB=resolveContributorNames(b.contributors);
+    return (cA.length?cA[0].name:'').localeCompare(cB.length?cB[0].name:'');
+  }).map(function(i){
+    var contribs=resolveContributorNames(i.contributors).map(function(c){return c.name;}).join(', ');
+    return [i.title,i.status,memberName(i.submitter),contribs,i.problem];
+  });fn='ideas.csv';}
+  else if(view==='sprints'){header=['Member','Sprint','Committed SP','Completed SP','Idea Target','Comments'];rows=S.sprints.map(function(s){return [memberName(s.member),s.sprint,s.committed,s.completed,s.targetIdeas||0,s.comments];});fn='sprints.csv';}
+  else if(view==='training'){header=['Member','Emp ID'].concat((S.training.courses||[]).map(function(c){return c.id;}));rows=S.members.map(function(m){return [m.name,m.id].concat((S.training.courses||[]).map(function(c){return (S.training.status[m.id]||{})[c.id]||'';}));});fn='training.csv';}
+  var lines=[header.join(',')];
+  rows.forEach(function(r){lines.push(r.map(function(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}).join(','));});
+  var blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;a.click();
+  toast('CSV exported!','s');
+}
+function exportPDF(){
+  var tC=S.sprints.reduce(function(a,b){return a+b.committed;},0);
+  var tD=S.sprints.reduce(function(a,b){return a+b.completed;},0);
+  var win=window.open('','_blank');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Sprint Report</title><style>body{font-family:Segoe UI,sans-serif;font-size:13px;color:#111;padding:36px}h1{font-size:22px;font-weight:700;margin-bottom:4px}.sub{color:#666;font-size:12px;margin-bottom:20px}.metrics{display:flex;gap:14px;margin-bottom:20px}.m{background:#f5f7fa;border-radius:8px;padding:12px 18px;flex:1}.mv{font-size:24px;font-weight:700;color:#1d4ed8}.ml{font-size:11px;color:#888;text-transform:uppercase;margin-top:4px}table{width:100%;border-collapse:collapse}th{background:#f5f7fa;font-size:11px;text-transform:uppercase;color:#555;padding:9px 12px;text-align:left}td{padding:9px 12px;border-bottom:1px solid #eee;font-size:12px}.footer{margin-top:24px;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:10px}</style></head><body>'
+    +'<h1>BlueBolt Sprint Report</h1>'
+    +'<div class="sub">Generated '+new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})+'</div>'
+    +'<div class="metrics"><div class="m"><div class="mv">'+tC+'</div><div class="ml">Committed SP</div></div><div class="m"><div class="mv">'+tD+'</div><div class="ml">Completed SP</div></div><div class="m"><div class="mv">'+(tC?Math.round(tD/tC*100):0)+'%</div><div class="ml">Completion Rate</div></div><div class="m"><div class="mv">'+S.members.length+'</div><div class="ml">Members</div></div></div>'
+    +'<table><thead><tr><th>Member</th><th>Sprint</th><th>Committed</th><th>Completed</th><th>Target Ideas</th><th>Comments</th></tr></thead><tbody>'
+    +S.sprints.map(function(s){return '<tr><td>'+memberName(s.member)+'</td><td>'+s.sprint+'</td><td>'+s.committed+'</td><td>'+s.completed+'</td><td>'+(s.targetIdeas||0)+'</td><td>'+(s.comments||'-')+'</td></tr>';}).join('')
+    +'</tbody></table><div class="footer">BlueBolt Innovation Tracker</div></body></html>');
+  win.document.close();win.focus();setTimeout(function(){win.print();},500);
+  toast('PDF ready - use browser print','s');
+}
+
+// INIT
+document.getElementById('today-lbl').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('load-url').textContent=API_BASE;
+document.getElementById('api-url').textContent=API_BASE.replace('/api','');
+document.querySelectorAll('.ov').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('open');});});
+
+(function boot(){
+  var safety=setTimeout(function(){
+    document.getElementById('load-ov').style.display='none';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('dash-con').innerHTML='<div style="max-width:500px;margin:40px auto;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:14px;padding:28px 32px"><div style="font-size:24px;margin-bottom:10px">Could not connect</div><div style="font-size:13px;color:var(--mu2);line-height:1.8;margin-bottom:18px">The tool tried to reach <strong>'+API_BASE+'</strong> but got no response.</div><ul style="font-size:12px;color:var(--mu2);line-height:2;padding-left:18px"><li>Is the black terminal window (server.py) still open and running?</li><li>Does the terminal show <strong style="color:var(--tx)">Running on http://127.0.0.1:8080</strong>?</li><li>Try opening <a href="'+API_BASE+'/health" target="_blank" style="color:var(--blue)">'+API_BASE+'/health</a> - you should see JSON.</li></ul><div style="margin-top:18px;display:flex;gap:10px"><button class="btn btn-p" onclick="retryConnect()">Retry</button><button class="btn btn-sm" onclick="window.open(\''+API_BASE+'/health\',\'_blank\')">Test Health URL</button></div></div>';
+  },10000);
+  loadAll().then(function(ok){
+    clearTimeout(safety);
+    document.getElementById('load-ov').style.display='none';
+    document.getElementById('app').style.display='flex';
+    if(ok) renderDashboard();
+  });
+}());
+
+function retryConnect(){
+  document.getElementById('dash-con').innerHTML='<div style="text-align:center;padding:60px"><div class="spinner" style="margin:0 auto 14px"></div><div style="color:var(--mu)">Reconnecting...</div></div>';
+  loadAll().then(function(ok){if(ok){renderDashboard();toast('Connected!','s');}else{toast('Still cannot connect','e');}});
+}
+
+setInterval(function(){
+  loadAll().then(function(ok){
+    if(ok){
+      var a=document.querySelector('.sec.active');
+      if(a){var id=a.id.replace('sec-','');var R={dashboard:renderDashboard,members:renderMembers,ideas:renderIdeas,sprints:renderSprints,training:renderTraining,graphs:renderGraphs,pods:renderPods};if(R[id])R[id]();}
+    }
+  });
+},30000);
+</script>
+</body>
+</html>
