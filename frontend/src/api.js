@@ -2,11 +2,11 @@
 // Vite proxies them to the FastAPI server on :8080 (see vite.config.js).
 const BASE = '/api'
 
-async function req(path, method = 'GET', body) {
+async function req(path, method = 'GET', body, timeoutMs = 8000) {
   const opts = { method, headers: { 'Content-Type': 'application/json' } }
   if (body) opts.body = JSON.stringify(body)
   const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), 8000)
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
   opts.signal = ctrl.signal
   try {
     const res = await fetch(BASE + path, opts)
@@ -102,6 +102,11 @@ export const deleteDefect = (id) => req('/defects/' + enc(id), 'DELETE')
 
 export const getAudit = () => req('/audit')
 export const health = () => req('/health')
+
+// ---- Automated test report ----
+export const getTestReport = () => req('/tests/report')
+// Running tests is slow (a few seconds to ~30s), so use a generous timeout.
+export const runTests = (suite = 'all') => req('/tests/run?suite=' + enc(suite), 'POST', undefined, 240000)
 
 // ---- Database backups (server-side snapshots) ----
 export const getBackups = () => req('/backups')

@@ -26,6 +26,10 @@ backend/backups/
 *.db-wal
 *.db-shm
 
+# ---- Test artifacts ----
+backend/.test_report.json
+frontend/test-results/
+
 # ---- Logs ----
 *.log
 

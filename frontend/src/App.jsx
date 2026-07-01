@@ -17,6 +17,7 @@ import CustomFields from './components/CustomFields'
 import DataQuality from './components/DataQuality'
 import Audit from './components/Audit'
 import Backups from './components/Backups'
+import TestReport from './components/TestReport'
 
 const SECTIONS = {
   dashboard: Dashboard,
@@ -34,6 +35,7 @@ const SECTIONS = {
   'data-quality': DataQuality,
   audit: Audit,
   backups: Backups,
+  'test-report': TestReport,
 }
 
 function LoadOverlay() {

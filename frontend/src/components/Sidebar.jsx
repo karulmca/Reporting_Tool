@@ -17,6 +17,7 @@ const icons = {
   audit: (<svg {...I}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14,2 14,8 20,8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>),
   'data-quality': (<svg {...I}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>),
   backups: (<svg {...I}><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5" /><path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6" /></svg>),
+  'test-report': (<svg {...I}><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>),
   defects: (<svg {...I}><path d="M12 2l3 3M9 5l3-3M12 8v13" /><rect x="7" y="8" width="10" height="9" rx="3" /><path d="M3 11h4M17 11h4M3 16h4M17 16h4" /></svg>),
   'scrum-board': (<svg {...I}><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18M15 3v18" /><path d="M5 7h2M11 7h2M17 7h2" /></svg>),
   'board-settings': (<svg {...I}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>),
@@ -26,7 +27,7 @@ const GROUPS = [
   { group: 'Overview', items: [{ id: 'dashboard', label: 'Dashboard' }] },
   { group: 'Tracking', items: [{ id: 'members', label: 'Members', badge: 'members' }, { id: 'ideas', label: 'Ideas', badge: 'ideas' }, { id: 'sprints', label: 'Sprint Tracker' }, { id: 'scrum-board', label: 'Scrum Board' }, { id: 'training', label: 'Training' }] },
   { group: 'Analytics', items: [{ id: 'graphs', label: 'Graphs & Progress' }, { id: 'member-analytics', label: 'Member Progress' }, { id: 'defects', label: 'Defect Density' }] },
-  { group: 'Admin', items: [{ id: 'pods', label: 'PODs / Teams' }, { id: 'fields', label: 'Custom Fields' }, { id: 'board-settings', label: 'Board Settings' }, { id: 'data-quality', label: 'Data Quality' }, { id: 'audit', label: 'Audit Log' }, { id: 'backups', label: 'Backups' }] },
+  { group: 'Admin', items: [{ id: 'pods', label: 'PODs / Teams' }, { id: 'fields', label: 'Custom Fields' }, { id: 'board-settings', label: 'Board Settings' }, { id: 'data-quality', label: 'Data Quality' }, { id: 'audit', label: 'Audit Log' }, { id: 'backups', label: 'Backups' }, { id: 'test-report', label: 'Test Report' }] },
 ]
 
 export default function Sidebar({ active, onNav }) {

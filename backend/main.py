@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from database import init_db
-from routes import pods, members, ideas, sprints, training, fields, defects, board, misc, backups
+from routes import pods, members, ideas, sprints, training, fields, defects, board, misc, backups, tests
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -46,6 +46,7 @@ app.include_router(fields.router)
 app.include_router(defects.router)
 app.include_router(board.router)
 app.include_router(backups.router)
+app.include_router(tests.router)
 app.include_router(misc.router)
 
 

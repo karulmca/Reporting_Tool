@@ -20,5 +20,9 @@ export default defineConfig({
     setupFiles: './src/test/setup.js',
     css: false,
     include: ['src/**/*.{test,spec}.{js,jsx}'],
+    // Emit a JSON report alongside the console output so the in-app Test Report
+    // view can display the latest frontend results.
+    reporters: ['default', 'json'],
+    outputFile: { json: './test-results/frontend.json' },
   },
 })
