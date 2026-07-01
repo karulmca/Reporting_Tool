@@ -73,6 +73,7 @@ def ensure_schema():
             ('on_card', 'INTEGER DEFAULT 0'),
             ('sort', 'INTEGER DEFAULT 0'),
         ],
+        'member': [('country', "TEXT DEFAULT ''")],
         'pod': [('framework_id', "TEXT DEFAULT ''")],
         'boardcolumn': [('framework_id', "TEXT DEFAULT ''")],
         'workitemtype': [('framework_id', "TEXT DEFAULT ''")],

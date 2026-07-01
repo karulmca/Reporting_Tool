@@ -11,22 +11,31 @@ def test_list_members_seeded(client):
 def test_create_update_delete_member(client):
     r = client.post('/api/members', json={
         'id': 'T100', 'name': 'Test User', 'pod': 'BE', 'target': 9,
-        'custom': {'note': 'hi'},
+        'country': 'India', 'custom': {'note': 'hi'},
     })
     assert r.status_code == 200
     body = r.json()
     assert body['id'] == 'T100'
     assert body['target'] == 9
+    assert body['country'] == 'India'
     assert body['custom'] == {'note': 'hi'}
 
-    r = client.put('/api/members/T100', json={'name': 'Renamed', 'target': 15})
+    r = client.put('/api/members/T100', json={'name': 'Renamed', 'target': 15, 'country': 'USA'})
     assert r.status_code == 200
     assert r.json()['name'] == 'Renamed'
     assert r.json()['target'] == 15
+    assert r.json()['country'] == 'USA'
 
     r = client.delete('/api/members/T100')
     assert r.status_code == 200
     assert r.json() == {'ok': True}
+
+
+def test_member_country_defaults_blank(client):
+    r = client.post('/api/members', json={'id': 'T150', 'name': 'No Country'})
+    assert r.status_code == 200
+    assert r.json()['country'] == ''
+    client.delete('/api/members/T150')
 
 
 def test_create_member_requires_id_and_name(client):
@@ -51,7 +60,7 @@ def test_delete_missing_member_404(client):
 
 def test_bulk_members(client):
     rows = [
-        {'id': 'B1', 'name': 'Bulk One', 'pod': 'FE'},
+        {'id': 'B1', 'name': 'Bulk One', 'pod': 'FE', 'country': 'India'},
         {'id': 'B2', 'name': 'Bulk Two', 'pod': 'BE'},
         {'id': '', 'name': 'No id'},               # error row
         {'id': 'B3', 'name': 'Bad pod', 'pod': 'ZZ'},  # unknown pod row
@@ -62,5 +71,8 @@ def test_bulk_members(client):
     assert res['created'] == 2
     assert res['total'] == 4
     assert len(res['errors']) == 2
+    # Country from the sheet is stored.
+    b1 = next(m for m in client.get('/api/members').json() if m['id'] == 'B1')
+    assert b1['country'] == 'India'
     client.delete('/api/members/B1')
     client.delete('/api/members/B2')

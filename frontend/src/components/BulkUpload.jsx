@@ -16,7 +16,7 @@ function buildConfig(kind, data, pod) {
   }, {})
 
   if (kind === 'member') {
-    const base = ['Employee ID', 'Full Name', 'POD Code', 'Service Line', 'Annual Target']
+    const base = ['Employee ID', 'Full Name', 'POD Code', 'Service Line', 'Country', 'Annual Target']
     const codes = data.pods.map((p) => p.code).join(', ')
     return {
       label: 'Members',
@@ -31,6 +31,8 @@ function buildConfig(kind, data, pod) {
         // Accept the new "POD Code" header (and the old "POD") for safety.
         pod: String(r['POD Code'] || r['POD'] || '').trim(),
         sl: String(r['Service Line'] || '').trim() || 'M&E',
+        // Country is optional; accept a couple of common header spellings.
+        country: String(r['Country'] || r['Location'] || '').trim(),
         target: parseInt(r['Annual Target'], 10) || 12,
         custom: cfObj(r),
       }),
@@ -42,6 +44,7 @@ function buildConfig(kind, data, pod) {
         ['', '', ''],
         ['Notes', '', ''],
         ['POD Code', 'must exactly match a Code above (blank = no POD)', ''],
+        ['Country', 'optional location, e.g. India / USA (blank allowed)', ''],
         ['Annual Target', 'whole number (default 12)', ''],
         ['Employee ID', 'existing IDs are updated; new IDs are created', ''],
       ],

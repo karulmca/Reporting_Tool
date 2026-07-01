@@ -6,7 +6,7 @@ import CustomFieldInputs from './CustomFieldInputs'
 import { implCount, progCount, podColor } from '../lib/helpers'
 import { exportCSV } from '../lib/exports'
 
-const blankAdd = { name: '', id: '', pod: '', sl: '', target: 12, custom: {} }
+const blankAdd = { name: '', id: '', pod: '', sl: '', country: '', target: 12, custom: {} }
 
 export default function Members() {
   const { data, isAdmin, run, api, toast } = useApp()
@@ -14,12 +14,21 @@ export default function Members() {
   const cf = data.customFields.member || []
   const [slF, setSlF] = useState('')
   const [podF, setPodF] = useState('')
+  const [countryF, setCountryF] = useState('')
   const [add, setAdd] = useState(null)
   const [edit, setEdit] = useState(null)
+
+  // Distinct countries present in the data (drives the filter + only shown if any).
+  const countries = useMemo(
+    () => [...new Set(members.map((m) => m.country).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    [members],
+  )
+  const hasCountry = countries.length > 0
 
   let rows = members
   if (slF) rows = rows.filter((m) => m.sl === slF)
   if (podF) rows = rows.filter((m) => m.pod === podF)
+  if (countryF) rows = rows.filter((m) => m.country === countryF)
   rows = rows.slice().sort((a, b) => a.name.localeCompare(b.name))
 
   // Distinct Service Lines, sourced from PODs and existing members.
@@ -47,14 +56,14 @@ export default function Members() {
     if (!add.name.trim() || !add.id.trim()) { toast('Name and ID required', 'e'); return }
     if (!add.sl) { toast('Select a Service Line', 'e'); return }
     if (!add.pod) { toast('Select a POD / Team', 'e'); return }
-    const ok = await run(() => api.createMember({ id: add.id.trim(), name: add.name.trim(), pod: add.pod, sl: add.sl, target: parseInt(add.target) || 12, custom: add.custom }), 'Member added!')
+    const ok = await run(() => api.createMember({ id: add.id.trim(), name: add.name.trim(), pod: add.pod, sl: add.sl, country: (add.country || '').trim(), target: parseInt(add.target) || 12, custom: add.custom }), 'Member added!')
     if (ok) setAdd(null)
   }
   function openEdit(m) {
-    setEdit({ origId: m.id, name: m.name, id: m.id, pod: m.pod, sl: m.sl, target: m.target, custom: { ...(m.custom || {}) } })
+    setEdit({ origId: m.id, name: m.name, id: m.id, pod: m.pod, sl: m.sl, country: m.country || '', target: m.target, custom: { ...(m.custom || {}) } })
   }
   async function submitEdit() {
-    const ok = await run(() => api.updateMember(edit.origId, { name: edit.name, pod: edit.pod, sl: edit.sl, target: parseInt(edit.target) || 12, custom: edit.custom }), 'Member updated!')
+    const ok = await run(() => api.updateMember(edit.origId, { name: edit.name, pod: edit.pod, sl: edit.sl, country: (edit.country || '').trim(), target: parseInt(edit.target) || 12, custom: edit.custom }), 'Member updated!')
     if (ok) setEdit(null)
   }
   async function del(id) {
@@ -76,6 +85,12 @@ export default function Members() {
             <option value="">All PODs</option>
             {pods.filter((p) => !slF || p.sl === slF).map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}
           </select>
+          {hasCountry && (
+            <select style={{ width: 'auto' }} value={countryF} onChange={(e) => setCountryF(e.target.value)}>
+              <option value="">All Countries</option>
+              {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          )}
           <button className="btn btn-p btn-sm" onClick={openAdd}>+ Add Member</button>
           <BulkUpload kind="member" />
           <button className="btn btn-sm" onClick={() => exportCSV('members', data, { pod: podF, sl: slF })}>&#8659; CSV</button>
@@ -85,7 +100,7 @@ export default function Members() {
         {!rows.length ? <Empty>No members found</Empty> : (
           <div className="tw"><table>
             <thead><tr>
-              <th>Member</th><th>Emp ID</th><th>POD</th><th>Service Line</th><th>Target</th><th>Submitted</th><th>Implemented</th><th>In Progress</th><th>Gap</th>
+              <th>Member</th><th>Emp ID</th><th>POD</th><th>Service Line</th>{hasCountry && <th>Country</th>}<th>Target</th><th>Submitted</th><th>Implemented</th><th>In Progress</th><th>Gap</th>
               {cf.map((f) => <th key={f.id}>{f.label}</th>)}
               {isAdmin && <th>Actions</th>}
             </tr></thead>
@@ -105,6 +120,7 @@ export default function Members() {
                     <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{m.id}</td>
                     <td><PodBadge pods={pods} code={m.pod} podColor={podColor} /></td>
                     <td style={{ color: 'var(--mu2)' }}>{m.sl}</td>
+                    {hasCountry && <td style={{ color: 'var(--mu2)' }}>{m.country || '-'}</td>}
                     <td style={{ fontFamily: 'var(--mono)' }}>{m.target}</td>
                     <td><span className="badge bp">{submitted}</span></td>
                     <td><span className="badge bg">{done}</span></td>
@@ -134,7 +150,10 @@ export default function Members() {
             <Field label="Service Line"><select value={add.sl} onChange={(e) => setAdd({ ...add, sl: e.target.value, pod: '' })}>{slOptions(add.sl)}</select></Field>
             <Field label="POD / Team"><select value={add.pod} onChange={(e) => setAdd({ ...add, pod: e.target.value })}>{podOptionsForSL(add.sl)}</select></Field>
           </div>
-          <Field label="Annual Target (Ideas)"><input type="number" min="0" value={add.target} onChange={(e) => setAdd({ ...add, target: e.target.value })} /></Field>
+          <div className="fg2">
+            <Field label="Country"><input value={add.country} placeholder="e.g. India" onChange={(e) => setAdd({ ...add, country: e.target.value })} /></Field>
+            <Field label="Annual Target (Ideas)"><input type="number" min="0" value={add.target} onChange={(e) => setAdd({ ...add, target: e.target.value })} /></Field>
+          </div>
           <CustomFieldInputs fields={cf} values={add.custom} onChange={(id, v) => setAdd({ ...add, custom: { ...add.custom, [id]: v } })} />
         </>}
       </Modal>
@@ -150,7 +169,10 @@ export default function Members() {
             <Field label="POD / Team"><select value={edit.pod} onChange={(e) => setEdit({ ...edit, pod: e.target.value })}>{podOptions}</select></Field>
             <Field label="Service Line"><select value={edit.sl} onChange={(e) => setEdit({ ...edit, sl: e.target.value })}>{slOptions(edit.sl)}</select></Field>
           </div>
-          <Field label="Annual Target"><input type="number" min="0" value={edit.target} onChange={(e) => setEdit({ ...edit, target: e.target.value })} /></Field>
+          <div className="fg2">
+            <Field label="Country"><input value={edit.country} placeholder="e.g. India" onChange={(e) => setEdit({ ...edit, country: e.target.value })} /></Field>
+            <Field label="Annual Target"><input type="number" min="0" value={edit.target} onChange={(e) => setEdit({ ...edit, target: e.target.value })} /></Field>
+          </div>
           <CustomFieldInputs fields={cf} values={edit.custom} onChange={(id, v) => setEdit({ ...edit, custom: { ...edit.custom, [id]: v } })} />
         </>}
       </Modal>

@@ -14,6 +14,7 @@ class MemberIn(BaseModel):
     name: Optional[str] = None
     pod: Optional[str] = None
     sl: Optional[str] = 'M&E'
+    country: Optional[str] = None
     target: Optional[int] = 12
     custom: Optional[dict] = None
 
@@ -34,7 +35,7 @@ def create_member(payload: MemberIn):
         try:
             return MemberService.create(
                 sess, payload.id, payload.name, payload.pod,
-                payload.sl, payload.target, payload.custom,
+                payload.sl, payload.target, payload.custom, payload.country,
             )
         except ValueError as ex:
             raise HTTPException(status_code=400, detail=str(ex))
@@ -51,7 +52,7 @@ def update_member(member_id: str, payload: MemberIn):
     with Session(engine) as sess:
         result = MemberService.update(
             sess, member_id, payload.name, payload.pod,
-            payload.sl, payload.target, payload.custom,
+            payload.sl, payload.target, payload.custom, payload.country,
         )
         if not result:
             raise HTTPException(status_code=404, detail='Member not found')

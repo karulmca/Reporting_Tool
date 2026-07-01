@@ -25,8 +25,8 @@ export function exportCSV(view, data, opts = {}) {
     const submittedCount = (id) => ideas.filter((i) => i.submitter === id).length
     const fname = pod ? `members_${pod}` : sl ? `members_${sl.replace(/[^a-z0-9]+/gi, '_')}` : 'members'
     downloadCSV(
-      ['Emp ID', 'Name', 'POD', 'Service Line', 'Target', 'Submitted', 'Implemented', 'In Progress', 'Gap'],
-      list.map((m) => [m.id, m.name, m.pod, m.sl, m.target, submittedCount(m.id), implCount(ideas, m.id), progCount(ideas, m.id), m.target - implCount(ideas, m.id)]),
+      ['Emp ID', 'Name', 'POD', 'Service Line', 'Country', 'Target', 'Submitted', 'Implemented', 'In Progress', 'Gap'],
+      list.map((m) => [m.id, m.name, m.pod, m.sl, m.country || '', m.target, submittedCount(m.id), implCount(ideas, m.id), progCount(ideas, m.id), m.target - implCount(ideas, m.id)]),
       `${fname}.csv`,
     )
   } else if (view === 'ideas') {

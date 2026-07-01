@@ -26,6 +26,7 @@ class Member(SQLModel, table=True):
     name: str = ''
     pod: str = ''
     sl: str = 'M&E'
+    country: str = ''         # optional location, populated from the upload sheet
     target: int = 12          # annual idea target
     custom_json: str = Field(default='{}', sa_column=Column(Text))
 
