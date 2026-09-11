@@ -58,7 +58,8 @@ class Idea(SQLModel, table=True):
     created_on: str = ''       # "Idea Created On" (stored as text)
     rating: float = 0          # "Overall Idea Rating"
     savings_type: str = ''     # '' | 'Soft Dollar' | 'Hard Dollar'
-    savings_amount: float = 0  # estimated dollar savings for this idea
+    savings_amount: float = 0  # estimated dollar savings for this idea ("Benefit Value (In $)")
+    metric: str = ''           # "Bluebolt Metric" — free-text category used to split savings on the dashboard
     sprint: str = ''           # sprint/month this idea is mapped to
     comments: str = Field(default='', sa_column=Column(Text))  # free-text idea details / notes
     custom_json: str = Field(default='{}', sa_column=Column(Text))

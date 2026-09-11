@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  fmtUSD, sumSavings, initials, memberByID, memberName, podColor,
+  fmtUSD, sumSavings, savingsByMetric, initials, memberByID, memberName, podColor,
   statusClass, implCount, progCount, resolveContributorNames, PAL,
 } from './helpers'
 
@@ -39,6 +39,26 @@ describe('sumSavings', () => {
   it('filters by type', () => {
     expect(sumSavings(ideas, 'Hard Dollar')).toBe(5000)
     expect(sumSavings(ideas, 'Soft Dollar')).toBe(1000)
+  })
+})
+
+describe('savingsByMetric', () => {
+  const metricIdeas = [
+    { savings_amount: 5000, metric: 'Productivity' },
+    { savings_amount: 3000, metric: 'Productivity' },
+    { savings_amount: 2000, metric: 'Quality' },
+    { savings_amount: 1000, metric: '' },       // no metric tagged -> Unspecified
+    { savings_amount: 0, metric: 'Zero' },       // no savings -> excluded entirely
+  ]
+  it('sums savings per metric and sorts descending', () => {
+    expect(savingsByMetric(metricIdeas)).toEqual([
+      { metric: 'Productivity', amount: 8000 },
+      { metric: 'Quality', amount: 2000 },
+      { metric: 'Unspecified', amount: 1000 },
+    ])
+  })
+  it('returns an empty array when nothing has savings', () => {
+    expect(savingsByMetric([{ savings_amount: 0, metric: 'X' }])).toEqual([])
   })
 })
 

@@ -69,6 +69,7 @@ def _to_dict(i: Idea):
         'rating': i.rating,
         'savings_type': i.savings_type,
         'savings_amount': i.savings_amount,
+        'metric': i.metric,
         'sprint': i.sprint,
         'comments': i.comments,
         'custom': json.loads(i.custom_json or '{}'),
@@ -130,6 +131,7 @@ class IdeaService:
             rating=float(extra.get('rating') or 0),
             savings_type=(extra.get('savings_type') or '').strip(),
             savings_amount=float(extra.get('savings_amount') or 0),
+            metric=(extra.get('metric') or '').strip(),
             sprint=(sprint or '').strip(),
             comments=extra.get('comments') or '',
             custom_json=json.dumps(custom or {}),
@@ -157,7 +159,7 @@ class IdeaService:
             i.custom_json = json.dumps(custom)
         for fld in ('workflow', 'source', 'project_name', 'solution', 'benefit',
                     'competency', 'tags', 'created_on', 'contributors', 'submitter_name',
-                    'savings_type', 'comments'):
+                    'savings_type', 'metric', 'comments'):
             if fld in extra and extra[fld] is not None:
                 setattr(i, fld, extra[fld])
         if 'rating' in extra and extra['rating'] is not None:
@@ -246,8 +248,16 @@ class IdeaService:
             target.tags = (r.tags or '').strip()
             target.created_on = (r.created_on or '').strip()
             target.rating = float(r.rating or 0)
-            target.savings_type = (r.savings_type or '').strip()
+            # "Dollar Saving Type" isn't a column in the Idea Wall export, so a
+            # blank value here just means the sheet didn't carry it — leave any
+            # manually-tagged Hard/Soft Dollar classification alone rather than
+            # wiping it out on every re-upload.
+            if (r.savings_type or '').strip():
+                target.savings_type = r.savings_type.strip()
+            # "Benefit Value (In $)" / "Bluebolt Metric" DO come from the sheet,
+            # so they're synced in full each time (sheet is the source of truth).
             target.savings_amount = float(r.savings_amount or 0)
+            target.metric = (r.metric or '').strip()
             target.comments = r.comments or ''
             # The export has no Sprint column; keep any manually-assigned sprint.
             if (r.sprint or '').strip():

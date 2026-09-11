@@ -23,6 +23,22 @@ export function sumSavings(ideas, type) {
   return ideas.reduce((a, i) => a + ((!type || i.savings_type === type) ? (Number(i.savings_amount) || 0) : 0), 0)
 }
 
+// Split the total dollar savings by "Bluebolt Metric" (a free-text category
+// from the Idea Wall export, not a fixed list like SAVINGS_TYPES). Ideas with
+// no savings amount are skipped; those with an amount but no metric tagged are
+// grouped under "Unspecified" so the split still accounts for the full total.
+// Returned sorted by amount, descending.
+export function savingsByMetric(ideas) {
+  const totals = new Map()
+  ideas.forEach((i) => {
+    const amt = Number(i.savings_amount) || 0
+    if (!amt) return
+    const key = (i.metric || '').trim() || 'Unspecified'
+    totals.set(key, (totals.get(key) || 0) + amt)
+  })
+  return [...totals.entries()].map(([metric, amount]) => ({ metric, amount })).sort((a, b) => b.amount - a.amount)
+}
+
 export function initials(n) {
   return (n || '').split(/[ ,]/).filter(Boolean).map((x) => x[0]).join('').toUpperCase().slice(0, 2)
 }

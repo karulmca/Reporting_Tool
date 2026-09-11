@@ -74,7 +74,7 @@ export default function Ideas() {
   function openAdd() {
     setAdd({ idea_id: '', pod: '', problem: '', title: '', desc: '', solution: '', benefit: '',
       submitter: members[0] ? members[0].id : '', status: 'Proposed', stage: '',
-      savings_type: '', savings_amount: '',
+      savings_type: '', savings_amount: '', metric: '',
       workflow: '', competency: '', tags: '', project_name: '', sprint: '', contributors: '', comments: '', custom: {} })
   }
   function setAddPod(pod) {
@@ -91,7 +91,7 @@ export default function Ideas() {
       benefit: add.benefit, submitter: add.submitter, submitter_name: sub ? sub.name : '',
       contributors: add.contributors, status: add.status, stage: add.stage, workflow: add.workflow,
       competency: add.competency, tags: add.tags, project_name: add.project_name,
-      savings_type: add.savings_type, savings_amount: parseFloat(add.savings_amount) || 0,
+      savings_type: add.savings_type, savings_amount: parseFloat(add.savings_amount) || 0, metric: add.metric,
       sprint: add.sprint, comments: add.comments, custom: add.custom,
     }), 'Idea added!')
     if (ok) setAdd(null)
@@ -101,7 +101,7 @@ export default function Ideas() {
       problem: i.problem || '', desc: i.description || i.desc || '', solution: i.solution || '',
       benefit: i.benefit || '', workflow: i.workflow || '', competency: i.competency || '',
       tags: i.tags || '', project_name: i.project_name || '', contributors: i.contributors || '',
-      savings_type: i.savings_type || '', savings_amount: i.savings_amount || '',
+      savings_type: i.savings_type || '', savings_amount: i.savings_amount || '', metric: i.metric || '',
       sprint: i.sprint || '', comments: i.comments || '', custom: { ...(i.custom || {}) } })
   }
   async function submitEdit() {
@@ -109,7 +109,7 @@ export default function Ideas() {
       title: edit.title, status: edit.status, stage: edit.stage, problem: edit.problem,
       desc: edit.desc, solution: edit.solution, benefit: edit.benefit, workflow: edit.workflow,
       competency: edit.competency, tags: edit.tags, project_name: edit.project_name,
-      savings_type: edit.savings_type, savings_amount: parseFloat(edit.savings_amount) || 0,
+      savings_type: edit.savings_type, savings_amount: parseFloat(edit.savings_amount) || 0, metric: edit.metric,
       contributors: edit.contributors, sprint: edit.sprint, comments: edit.comments, custom: edit.custom,
     }), 'Idea updated!')
     if (ok) setEdit(null)
@@ -127,6 +127,9 @@ export default function Ideas() {
   const statusOptions = STATUSES.map((s) => <option key={s}>{s}</option>)
   const savingsTypeOptions = [<option key="" value="">— None —</option>]
     .concat(SAVINGS_TYPES.map((s) => <option key={s} value={s}>{s}</option>))
+  // Bluebolt Metric is free text (not a fixed list) — offer known values seen
+  // on other ideas as a datalist so entries stay consistent.
+  const metricChoices = [...new Set(ideas.map((i) => i.metric).filter(Boolean))].sort((a, b) => a.localeCompare(b))
   const sprintIdx = (s) => { const i = MONTHS.indexOf(s); return i < 0 ? 999 : i }
   const sprintNames = [...new Set(data.sprints.map((s) => s.sprint))].sort((a, b) => sprintIdx(a) - sprintIdx(b) || a.localeCompare(b))
   const sprintChoices = sprintNames.length ? sprintNames : MONTHS
@@ -168,7 +171,7 @@ export default function Ideas() {
           <div className="tw"><table>
             <thead><tr>
               <th>Idea ID</th><th>Title / Problem</th><th>Submitter</th><th>POD</th><th>Service Line</th><th>Stage</th><th>Workflow</th><th>Status</th>
-              <th>Saving Type</th><th style={{ textAlign: 'right' }}>Savings ($)</th>
+              <th>Saving Type</th><th style={{ textAlign: 'right' }}>Savings ($)</th><th>Bluebolt Metric</th>
               <th>Sprint</th><th>Contributors</th>
               {cf.map((f) => <th key={f.id}>{f.label}</th>)}
               <th>Actions</th>
@@ -203,6 +206,7 @@ export default function Ideas() {
                       ? <span className="badge" style={{ background: 'var(--s3)', color: idea.savings_type === 'Hard Dollar' ? 'var(--green)' : 'var(--teal, #14b8a6)', whiteSpace: 'nowrap' }}>{idea.savings_type}</span>
                       : <span style={{ fontSize: 11.5, color: 'var(--mu)' }}>—</span>}</td>
                     <td style={{ textAlign: 'right', fontFamily: 'var(--mono)', fontSize: 12, color: idea.savings_amount ? 'var(--green)' : 'var(--mu)' }}>{idea.savings_amount ? fmtUSD(idea.savings_amount) : '—'}</td>
+                    <td style={{ fontSize: 11.5, color: idea.metric ? 'var(--mu2)' : 'var(--mu)', whiteSpace: 'nowrap' }}>{idea.metric || '—'}</td>
                     <td style={{ fontSize: 12, color: idea.sprint ? 'var(--mu2)' : 'var(--mu)', whiteSpace: 'nowrap' }}>{idea.sprint || '-'}</td>
                     <td style={{ fontSize: 11.5, color: 'var(--mu2)', maxWidth: 200 }}>
                       <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 190 }} title={idea.contributors || ''}>{idea.contributors || '-'}</div>
@@ -242,9 +246,10 @@ export default function Ideas() {
             <Field label="Submitter"><select value={add.submitter} onChange={(e) => setAdd({ ...add, submitter: e.target.value })}>{submitterOptions}</select></Field>
             <Field label="Status"><select value={add.status} onChange={(e) => setAdd({ ...add, status: e.target.value })}>{statusOptions}</select></Field>
           </div>
-          <div className="fg2">
+          <div className="fg3">
             <Field label="Dollar Saving Type"><select value={add.savings_type} onChange={(e) => setAdd({ ...add, savings_type: e.target.value })}>{savingsTypeOptions}</select></Field>
             <Field label="Savings Amount ($)"><input type="number" min="0" step="any" value={add.savings_amount} placeholder="e.g. 25000" onChange={(e) => setAdd({ ...add, savings_amount: e.target.value })} /></Field>
+            <Field label="Bluebolt Metric"><input list="idea-metrics" value={add.metric} placeholder="e.g. Productivity" onChange={(e) => setAdd({ ...add, metric: e.target.value })} /><datalist id="idea-metrics">{metricChoices.map((m) => <option key={m} value={m} />)}</datalist></Field>
           </div>
           <div className="fg3">
             <Field label="Stage"><input list="idea-stages" value={add.stage} onChange={(e) => setAdd({ ...add, stage: e.target.value })} /><datalist id="idea-stages">{STAGES.map((s) => <option key={s} value={s} />)}</datalist></Field>
@@ -278,9 +283,10 @@ export default function Ideas() {
             <Field label="Status"><select value={edit.status} onChange={(e) => setEdit({ ...edit, status: e.target.value })}>{statusOptions}</select></Field>
           </div>
           <div style={{ fontSize: 11, color: 'var(--mu)', marginTop: -4, marginBottom: 8 }}>Setting a Stage re-derives Status automatically; leave Stage unchanged to set Status manually.</div>
-          <div className="fg2">
+          <div className="fg3">
             <Field label="Dollar Saving Type"><select value={edit.savings_type} onChange={(e) => setEdit({ ...edit, savings_type: e.target.value })}>{savingsTypeOptions}</select></Field>
             <Field label="Savings Amount ($)"><input type="number" min="0" step="any" value={edit.savings_amount} placeholder="e.g. 25000" onChange={(e) => setEdit({ ...edit, savings_amount: e.target.value })} /></Field>
+            <Field label="Bluebolt Metric"><input list="idea-metrics-e" value={edit.metric} placeholder="e.g. Productivity" onChange={(e) => setEdit({ ...edit, metric: e.target.value })} /><datalist id="idea-metrics-e">{metricChoices.map((m) => <option key={m} value={m} />)}</datalist></Field>
           </div>
           <Field label="Problem Statement"><textarea value={edit.problem} onChange={(e) => setEdit({ ...edit, problem: e.target.value })} /></Field>
           <Field label="Description"><textarea style={{ minHeight: 70 }} value={edit.desc} onChange={(e) => setEdit({ ...edit, desc: e.target.value })} /></Field>
@@ -322,6 +328,7 @@ export default function Ideas() {
               <Row label="Benefit">{view.benefit}</Row>
               <Row label="Dollar Saving Type">{view.savings_type}</Row>
               <Row label="Savings Amount">{view.savings_amount ? fmtUSD(view.savings_amount) : ''}</Row>
+              <Row label="Bluebolt Metric">{view.metric}</Row>
               <Row label="Submitter">{sub.member ? `${sub.name} (${view.submitter})` : sub.name}</Row>
               <Row label="Contributors">{view.contributors}</Row>
               <Row label="Project">{view.project_name}</Row>

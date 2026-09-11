@@ -164,6 +164,7 @@ function buildConfig(kind, data, pod) {
   const ideaCols = [
     'Idea ID', 'ESA Project Name', 'Idea Submitter Name & ID', 'Idea Contributors Name & ID',
     'Idea Title', 'Problem Statement', 'Idea Description', 'Solution', 'Benefit Description',
+    'Bluebolt Metric', 'Benefit Value (In $)',
     'Idea Competency', 'Tags', 'Stage of the Idea', 'Idea Workflow', 'Idea source',
     'Idea Created On', 'Overall Idea Rating',
   ]
@@ -186,6 +187,10 @@ function buildConfig(kind, data, pod) {
         desc: String(pick(r, 'Idea Description', 'Description') || ''),
         solution: String(pick(r, 'Solution') || ''),
         benefit: String(pick(r, 'Benefit Description', 'Benefit') || ''),
+        // Dashboard "Total Savings" is driven by this amount; the metric is a
+        // free-text category (not a fixed list) used to split that total.
+        metric: String(pick(r, 'Bluebolt Metric', 'Metric') || '').trim(),
+        savings_amount: parseFloat(pick(r, 'Benefit Value (In $)', 'Benefit Value ($)', 'Benefit Value')) || 0,
         competency: String(pick(r, 'Idea Competency') || '').trim(),
         tags: String(pick(r, 'Tags') || '').trim(),
         stage: String(pick(r, 'Stage of the Idea') || '').trim(),
@@ -202,6 +207,8 @@ function buildConfig(kind, data, pod) {
       ['Re-uploading the same pair UPDATES the existing idea', '', ''],
       ['', '', ''],
       ['Idea Submitter Name & ID', 'format: Surname,Given(EmpID) e.g. Kuppusamy,Arul(2012144)', ''],
+      ['Benefit Value (In $)', 'drives the Dashboard "Total Savings" KPI (blank = 0)', ''],
+      ['Bluebolt Metric', 'free text category (e.g. Productivity, Quality) — splits Total Savings on the Dashboard', ''],
       ['', '', ''],
       ['STAGE → app status mapping', '', ''],
       ['Approved for implementation', '→ POC Stage', ''],

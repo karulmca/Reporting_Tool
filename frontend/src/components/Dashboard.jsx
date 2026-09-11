@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts'
 import { useApp } from '../store'
 import { StatusBadge } from './ui'
 import { Card } from './ChartKit'
-import { memberName, STATUSES, STATUS_COL, PAL, sumSavings, fmtUSD } from '../lib/helpers'
+import { memberName, STATUSES, STATUS_COL, PAL, sumSavings, savingsByMetric, fmtUSD } from '../lib/helpers'
 import { AX, merge } from '../lib/chartTheme'
 import { exportDashboardReportExcel } from '../lib/reportExport'
 
@@ -78,10 +78,25 @@ export default function Dashboard({ onNav }) {
   // of implemented ideas never rounds away to a misleading 0%).
   const implRate = ideas.length ? Math.round((impl / ideas.length) * 100) : 0
 
-  // Dollar savings: total plus the split by savings type (Hard vs Soft dollar).
+  // Dollar savings: total plus the split by savings type (Hard vs Soft dollar)
+  // and, separately, by Bluebolt Metric (a free-text category from the sheet).
   const totalSavings = sumSavings(ideas)
   const hardSavings = sumSavings(ideas, 'Hard Dollar')
   const softSavings = sumSavings(ideas, 'Soft Dollar')
+  const metricBreakdown = savingsByMetric(ideas)
+  const metricBarHeight = Math.max(220, metricBreakdown.length * 34 + 60)
+  const metricBar = {
+    series: [{ name: 'Savings', data: metricBreakdown.map((m) => m.amount) }],
+    options: merge({
+      chart: { id: 'd-metric' },
+      colors: metricBreakdown.map((_, i) => PAL[i % PAL.length]),
+      plotOptions: { bar: { horizontal: true, borderRadius: 3, barHeight: '70%', distributed: true } },
+      dataLabels: { enabled: true, offsetX: 0, formatter: (v) => (v ? fmtUSD(v) : ''), style: { fontSize: '10px', fontWeight: 700, colors: ['#fff'] }, dropShadow: { enabled: true, top: 1, left: 0, blur: 1, opacity: 0.45 } },
+      xaxis: { categories: metricBreakdown.map((m) => m.metric), labels: { formatter: (v) => fmtUSD(v) } },
+      tooltip: { y: { formatter: (v) => fmtUSD(v) } },
+      legend: { show: false },
+    }),
+  }
 
   // Pipeline composition by status, for the detail line under the KPI card.
   const pipelineBreakdown = PIPELINE.map((s) => ({ s, n: pipelineIdeas.filter((i) => i.status === s).length })).filter((x) => x.n)
@@ -186,6 +201,15 @@ export default function Dashboard({ onNav }) {
           <div className="mc"><div className="mc-l">In Progress</div><div className="mc-v" style={{ color: 'var(--blue)' }}>{inProg}</div><div className="mc-s">Active now</div></div>
           <div className="mc"><div className="mc-l">Pipeline</div><div className="mc-v" style={{ color: 'var(--purple)' }}>{pipeline}</div><div className="mc-s">{pipelineBreakdown.length ? pipelineBreakdown.map((x) => `${x.s} ${x.n}`).join(' · ') : 'Proposed · POC · New · Ideation'}</div></div>
           <div className="mc"><div className="mc-l">Total Savings</div><div className="mc-v" style={{ color: 'var(--green)' }}>{fmtUSD(totalSavings)}</div><div className="mc-s">{fmtUSD(hardSavings)} hard · {fmtUSD(softSavings)} soft</div></div>
+        </div>
+
+        {/* Total Savings, split by Bluebolt Metric */}
+        <div style={{ marginBottom: 14 }}>
+          <Card title="Savings by Bluebolt Metric" height={300} chartId="d-metric" note={metricBreakdown.length ? null : 'No savings tagged with a Bluebolt Metric yet.'}>
+            <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+              <Chart options={metricBar.options} series={metricBar.series} type="bar" height={metricBarHeight} />
+            </div>
+          </Card>
         </div>
 
         {/* Distribution donuts + attainment gauge */}

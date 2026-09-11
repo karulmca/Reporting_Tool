@@ -85,3 +85,37 @@ def test_bulk_ideas(client):
     assert res['created'] == 1
     assert len(res['errors']) == 1
     client.delete('/api/ideas/' + f'{SUBMITTER}-BLK-1')
+
+
+def test_bulk_ideas_maps_benefit_value_and_metric(client):
+    """'Benefit Value (In $)' -> savings_amount, 'Bluebolt Metric' -> metric."""
+    rows = [{'idea_id': 'BLK-SAV', 'title': 'Savings idea', 'submitter': SUBMITTER,
+             'savings_amount': 25000, 'metric': 'Productivity'}]
+    r = client.post('/api/ideas/bulk', json={'rows': rows})
+    assert r.status_code == 200
+    assert r.json()['created'] == 1
+
+    listed = next(i for i in client.get('/api/ideas').json() if i['idea_id'] == 'BLK-SAV')
+    assert listed['savings_amount'] == 25000
+    assert listed['metric'] == 'Productivity'
+    client.delete('/api/ideas/' + f'{SUBMITTER}-BLK-SAV')
+
+
+def test_bulk_reupload_preserves_manual_savings_type(client):
+    """Re-uploading a sheet with no 'Dollar Saving Type' column must not wipe
+    out a Hard/Soft Dollar tag that was set manually via the Idea edit form."""
+    idea_id = f'{SUBMITTER}-BLK-KEEP'
+    r = client.post('/api/ideas', json={'idea_id': 'BLK-KEEP', 'title': 'Keep type', 'submitter': SUBMITTER})
+    assert r.status_code == 200
+    client.put('/api/ideas/' + idea_id, json={'savings_type': 'Hard Dollar'})
+
+    # Re-upload the same idea via bulk, as the Idea Wall export would (no savings_type).
+    rows = [{'idea_id': 'BLK-KEEP', 'title': 'Keep type', 'submitter': SUBMITTER, 'savings_amount': 9000}]
+    r = client.post('/api/ideas/bulk', json={'rows': rows})
+    assert r.status_code == 200
+    assert r.json()['updated'] == 1
+
+    listed = next(i for i in client.get('/api/ideas').json() if i['idea_id'] == 'BLK-KEEP')
+    assert listed['savings_type'] == 'Hard Dollar'
+    assert listed['savings_amount'] == 9000
+    client.delete('/api/ideas/' + idea_id)

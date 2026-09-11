@@ -30,6 +30,7 @@ class IdeaIn(BaseModel):
     rating: Optional[float] = None
     savings_type: Optional[str] = None
     savings_amount: Optional[float] = None
+    metric: Optional[str] = None
     sprint: Optional[str] = ''
     comments: Optional[str] = None
     custom: Optional[dict] = None
@@ -43,7 +44,7 @@ class BulkIdeasIn(BaseModel):
 # only added for update() — create() already takes it as a positional argument.
 _EXTRA = ('idea_id', 'submitter_name', 'stage', 'workflow', 'source', 'project_name',
           'solution', 'benefit', 'competency', 'tags', 'created_on', 'rating',
-          'savings_type', 'savings_amount', 'comments')
+          'savings_type', 'savings_amount', 'metric', 'comments')
 
 
 def _extra(payload: 'IdeaIn', with_contrib: bool = False):

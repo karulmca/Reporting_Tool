@@ -62,6 +62,7 @@ def ensure_schema():
             ('savings_type', "TEXT DEFAULT ''"),
             ('savings_amount', "REAL DEFAULT 0"),
             ('comments', "TEXT DEFAULT ''"),
+            ('metric', "TEXT DEFAULT ''"),
         ],
         'defectrecord': [
             ('status', "TEXT DEFAULT 'Open'"),
