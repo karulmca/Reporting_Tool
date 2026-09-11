@@ -16,6 +16,7 @@ class SprintIn(BaseModel):
     completed: Optional[float] = 0
     targetIdeas: Optional[float] = 0
     comments: Optional[str] = ''
+    raw: Optional[dict] = None  # full bulk-upload row (every sheet column); bulk-only, ignored elsewhere
 
 
 class RenameIn(BaseModel):

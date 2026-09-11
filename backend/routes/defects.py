@@ -22,6 +22,7 @@ class DefectIn(BaseModel):
     rca_status: Optional[str] = None
     rca: Optional[str] = None
     comments: Optional[str] = ''
+    raw: Optional[dict] = None  # full bulk-upload row (every sheet column); bulk-only, ignored by create/update
 
 
 class BulkDefectsIn(BaseModel):

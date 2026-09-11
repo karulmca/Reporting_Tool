@@ -58,3 +58,15 @@ def test_create_duplicate_defect_rejected(client):
     r = client.post('/api/defects', json=payload)
     assert r.status_code == 400
     client.delete('/api/defects/' + str(first.json()['id']))
+
+
+def test_bulk_defects_captures_full_raw_row(client):
+    rows = [{'release': 'RBLK', 'sprint': "UT'BLK", 'pod': 'QA', 'high': 1,
+             'raw': {'Release': 'RBLK', 'Extra Col': 'keep me'}}]
+    r = client.post('/api/defects/bulk', json={'rows': rows})
+    assert r.status_code == 200
+    assert r.json()['created'] == 1
+
+    row = next(d for d in client.get('/api/defects').json() if d['release'] == 'RBLK')
+    assert row['raw']['Extra Col'] == 'keep me'
+    client.delete('/api/defects/' + str(row['id']))

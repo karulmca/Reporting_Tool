@@ -13,6 +13,7 @@ def _to_dict(m: Member):
         'country': m.country,
         'target': m.target,
         'custom': json.loads(m.custom_json or '{}'),
+        'raw': json.loads(m.raw_json or '{}'),
     }
 
 
@@ -105,10 +106,14 @@ class MemberService:
                     m.country = country
                 if r.custom is not None:
                     m.custom_json = json.dumps(r.custom)
+                # The full sheet row (every column) is synced in full each time,
+                # so any column without a dedicated field is still captured.
+                m.raw_json = json.dumps(r.raw or {})
                 updated += 1
             else:
                 m = Member(id=rid, name=name, pod=pod, sl=r.sl or 'M&E',
-                           country=country, target=target, custom_json=json.dumps(r.custom or {}))
+                           country=country, target=target, custom_json=json.dumps(r.custom or {}),
+                           raw_json=json.dumps(r.raw or {}))
                 created += 1
             session.add(m)
         session.commit()

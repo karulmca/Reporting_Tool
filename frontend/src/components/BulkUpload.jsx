@@ -35,6 +35,9 @@ function buildConfig(kind, data, pod) {
         country: String(r['Country'] || r['Location'] || '').trim(),
         target: parseInt(r['Annual Target'], 10) || 12,
         custom: cfObj(r),
+        // Every column from the sheet, verbatim — kept even if it has no
+        // dedicated field yet, so it's not lost if we need it later.
+        raw: { ...r },
       }),
       refSheet: 'PODs',
       reference: [
@@ -79,6 +82,9 @@ function buildConfig(kind, data, pod) {
         rca_status: String(r['RCA Status'] || '').trim(),
         rca: String(r['RCA'] || '').trim(),
         comments: String(r['Comments'] || '').trim(),
+        // Every column from the sheet, verbatim — kept even if it has no
+        // dedicated field yet, so it's not lost if we need it later.
+        raw: { ...r },
       }),
       refSheet: 'Reference',
       reference: [
@@ -129,6 +135,9 @@ function buildConfig(kind, data, pod) {
         completed: parseFloat(r['Completed SP']) || 0,
         targetIdeas: parseFloat(r['Idea Target']) || 0,
         comments: String(r['Comments'] || '').trim(),
+        // Every column from the sheet, verbatim — kept even if it has no
+        // dedicated field yet, so it's not lost if we need it later.
+        raw: { ...r },
       }),
       // Ignore pre-filled rows the user didn't assign a sprint to.
       skipRow: (r) => !r.sprint,
@@ -199,6 +208,9 @@ function buildConfig(kind, data, pod) {
         created_on: String(pick(r, 'Idea Created On') || '').trim(),
         rating: parseFloat(pick(r, 'Overall Idea Rating')) || 0,
         custom: cfObj(r),
+        // Every column from the sheet, verbatim — kept even if it has no
+        // dedicated field yet, so it's not lost if we need it later.
+        raw: { ...r },
       }
     },
     refSheet: 'Reference',

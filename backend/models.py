@@ -29,6 +29,7 @@ class Member(SQLModel, table=True):
     country: str = ''         # optional location, populated from the upload sheet
     target: int = 12          # annual idea target
     custom_json: str = Field(default='{}', sa_column=Column(Text))
+    raw_json: str = Field(default='{}', sa_column=Column(Text))  # full bulk-upload row (every sheet column), kept for future use
 
 
 class Idea(SQLModel, table=True):
@@ -63,6 +64,7 @@ class Idea(SQLModel, table=True):
     sprint: str = ''           # sprint/month this idea is mapped to
     comments: str = Field(default='', sa_column=Column(Text))  # free-text idea details / notes
     custom_json: str = Field(default='{}', sa_column=Column(Text))
+    raw_json: str = Field(default='{}', sa_column=Column(Text))  # full bulk-upload row (every sheet column), kept for future use
 
 
 class Sprint(SQLModel, table=True):
@@ -74,6 +76,7 @@ class Sprint(SQLModel, table=True):
     completed: float = 0
     target_ideas: float = 0
     comments: str = ''
+    raw_json: str = Field(default='{}', sa_column=Column(Text))  # full bulk-upload row (every sheet column), kept for future use
 
 
 class TrainingCourse(SQLModel, table=True):
@@ -205,6 +208,7 @@ class DefectRecord(SQLModel, table=True):
     rca_status: str = 'Not Started'  # Not Started | In Progress | Completed | Pending Review
     rca: str = Field(default='', sa_column=Column(Text))   # root-cause notes
     comments: str = Field(default='', sa_column=Column(Text))
+    raw_json: str = Field(default='{}', sa_column=Column(Text))  # full bulk-upload row (every sheet column), kept for future use
 
 
 class AuditLog(SQLModel, table=True):

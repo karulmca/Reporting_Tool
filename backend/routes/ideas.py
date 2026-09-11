@@ -34,6 +34,7 @@ class IdeaIn(BaseModel):
     sprint: Optional[str] = ''
     comments: Optional[str] = None
     custom: Optional[dict] = None
+    raw: Optional[dict] = None  # full bulk-upload row (every sheet column); bulk-only, ignored by create/update
 
 
 class BulkIdeasIn(BaseModel):

@@ -60,7 +60,7 @@ def test_delete_missing_member_404(client):
 
 def test_bulk_members(client):
     rows = [
-        {'id': 'B1', 'name': 'Bulk One', 'pod': 'FE', 'country': 'India'},
+        {'id': 'B1', 'name': 'Bulk One', 'pod': 'FE', 'country': 'India', 'raw': {'Employee ID': 'B1', 'Extra Col': 'x'}},
         {'id': 'B2', 'name': 'Bulk Two', 'pod': 'BE'},
         {'id': '', 'name': 'No id'},               # error row
         {'id': 'B3', 'name': 'Bad pod', 'pod': 'ZZ'},  # unknown pod row
@@ -74,5 +74,7 @@ def test_bulk_members(client):
     # Country from the sheet is stored.
     b1 = next(m for m in client.get('/api/members').json() if m['id'] == 'B1')
     assert b1['country'] == 'India'
+    # Every sheet column (even ones with no dedicated field) is kept.
+    assert b1['raw']['Extra Col'] == 'x'
     client.delete('/api/members/B1')
     client.delete('/api/members/B2')

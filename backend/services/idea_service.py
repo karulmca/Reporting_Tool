@@ -73,6 +73,7 @@ def _to_dict(i: Idea):
         'sprint': i.sprint,
         'comments': i.comments,
         'custom': json.loads(i.custom_json or '{}'),
+        'raw': json.loads(i.raw_json or '{}'),
     }
 
 
@@ -135,6 +136,8 @@ class IdeaService:
             sprint=(sprint or '').strip(),
             comments=extra.get('comments') or '',
             custom_json=json.dumps(custom or {}),
+            # raw_json (the full bulk-upload row) is only ever set by bulk_upsert;
+            # a manually-added idea has no sheet row, so it stays '{}'.
         )
         session.add(i)
         session.commit()
@@ -259,6 +262,9 @@ class IdeaService:
             target.savings_amount = float(r.savings_amount or 0)
             target.metric = (r.metric or '').strip()
             target.comments = r.comments or ''
+            # The full sheet row (every column) is synced in full each time, so
+            # any column without a dedicated field is still captured for later use.
+            target.raw_json = json.dumps(r.raw or {})
             # The export has no Sprint column; keep any manually-assigned sprint.
             if (r.sprint or '').strip():
                 target.sprint = r.sprint.strip()

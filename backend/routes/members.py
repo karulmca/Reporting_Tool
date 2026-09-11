@@ -17,6 +17,7 @@ class MemberIn(BaseModel):
     country: Optional[str] = None
     target: Optional[int] = 12
     custom: Optional[dict] = None
+    raw: Optional[dict] = None  # full bulk-upload row (every sheet column); bulk-only, ignored by create/update
 
 
 class BulkMembersIn(BaseModel):

@@ -65,3 +65,16 @@ def test_rename_and_delete_by_name(client):
 def test_rename_missing_sprint_404(client):
     r = client.put('/api/sprints/rename', json={'old': "GHOST'00", 'new': "X'00"})
     assert r.status_code == 404
+
+
+def test_bulk_sprints_captures_full_raw_row(client):
+    sp = "UT'RAW"
+    rows = [{'member': MEMBER, 'sprint': sp, 'committed': 5,
+             'raw': {'Employee ID': MEMBER, 'Extra Col': 'keep me'}}]
+    r = client.post('/api/sprints/bulk', json={'rows': rows})
+    assert r.status_code == 200
+    assert r.json()['created'] == 1
+
+    row = next(s for s in client.get('/api/sprints').json() if s['sprint'] == sp)
+    assert row['raw']['Extra Col'] == 'keep me'
+    client.delete('/api/sprints', params={'member': MEMBER, 'sprint': sp})

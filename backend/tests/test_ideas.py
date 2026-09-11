@@ -101,6 +101,20 @@ def test_bulk_ideas_maps_benefit_value_and_metric(client):
     client.delete('/api/ideas/' + f'{SUBMITTER}-BLK-SAV')
 
 
+def test_bulk_ideas_captures_full_raw_row(client):
+    """Every sheet column (even ones with no dedicated field) is kept on the
+    record so it's available later without another schema change."""
+    rows = [{'idea_id': 'BLK-RAW', 'title': 'Raw row idea', 'submitter': SUBMITTER,
+             'raw': {'Idea ID': 'BLK-RAW', 'Some Future Column': 'keep me'}}]
+    r = client.post('/api/ideas/bulk', json={'rows': rows})
+    assert r.status_code == 200
+    assert r.json()['created'] == 1
+
+    listed = next(i for i in client.get('/api/ideas').json() if i['idea_id'] == 'BLK-RAW')
+    assert listed['raw']['Some Future Column'] == 'keep me'
+    client.delete('/api/ideas/' + f'{SUBMITTER}-BLK-RAW')
+
+
 def test_bulk_reupload_preserves_manual_savings_type(client):
     """Re-uploading a sheet with no 'Dollar Saving Type' column must not wipe
     out a Hard/Soft Dollar tag that was set manually via the Idea edit form."""

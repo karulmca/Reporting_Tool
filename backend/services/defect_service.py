@@ -1,3 +1,4 @@
+import json
 from sqlmodel import Session, select
 from models import DefectRecord, POD
 from services.audit_service import AuditService
@@ -33,6 +34,7 @@ def _to_dict(d: DefectRecord):
         'rca_status': d.rca_status,
         'rca': d.rca,
         'comments': d.comments,
+        'raw': json.loads(d.raw_json or '{}'),
     }
 
 
@@ -174,6 +176,10 @@ class DefectService:
                     existing.rca = r.rca
                 if r.comments is not None:
                     existing.comments = r.comments
+                # The full sheet row (every column) is synced in full each
+                # time, so any column without a dedicated field is still
+                # captured for later use.
+                existing.raw_json = json.dumps(r.raw or {})
                 session.add(existing)
                 updated += 1
             else:
@@ -181,7 +187,8 @@ class DefectService:
                                          critical=c, high=h, medium=m, low=lo,
                                          status=(r.status or 'Open'), rca_category=(r.rca_category or ''),
                                          rca_status=(r.rca_status or 'Not Started'),
-                                         rca=(r.rca or ''), comments=r.comments or ''))
+                                         rca=(r.rca or ''), comments=r.comments or '',
+                                         raw_json=json.dumps(r.raw or {})))
                 created += 1
         session.commit()
         AuditService.log(session, 'UPSERT', 'Defect', f'bulk +{created} / ~{updated}')

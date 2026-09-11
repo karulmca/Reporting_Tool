@@ -1,3 +1,4 @@
+import json
 from sqlmodel import Session, select
 from models import Sprint, Member, Idea
 from services.audit_service import AuditService
@@ -13,6 +14,7 @@ def _to_dict(s: Sprint):
         'completed': s.completed,
         'target_ideas': s.target_ideas,
         'comments': s.comments,
+        'raw': json.loads(s.raw_json or '{}'),
     }
 
 
@@ -69,6 +71,9 @@ class SprintService:
             row.target_ideas = float(r.targetIdeas or 0)
             if r.comments is not None:
                 row.comments = r.comments or ''
+            # The full sheet row (every column) is synced in full each time, so
+            # any column without a dedicated field is still captured for later use.
+            row.raw_json = json.dumps(r.raw or {})
             session.add(row)
             if existing:
                 updated += 1
